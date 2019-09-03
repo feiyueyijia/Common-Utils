@@ -17,10 +17,6 @@ public class InvokeResult<T> {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
-    public ConfigurableApplicationContext getApplicationContext() {
-        return this.applicationContext;
-    }
-
     private static InvokeResult invokeResult;
 
     @PostConstruct
