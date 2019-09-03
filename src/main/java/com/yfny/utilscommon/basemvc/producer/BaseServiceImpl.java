@@ -4,6 +4,7 @@ import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yfny.utilscommon.basemvc.common.BaseEntity;
+import com.yfny.utilscommon.basemvc.common.BusinessException;
 import com.yfny.utilscommon.strategy.PageResultStrategy;
 import com.yfny.utilscommon.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.List;
  * Author jisongZhou
  * Date  2019-04-03
  */
-public abstract class BaseServiceImpl<T extends BaseEntity> {
+public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
 
     @Autowired
     private BaseComponent<T> baseComponent;
@@ -41,7 +42,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int insert(T entity) {
+    public int insert(T entity) throws BusinessException {
         save();
         return getBaseMapper().insert(entity);
     }
@@ -54,7 +55,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int insertSelective(T entity) {
+    public int insertSelective(T entity) throws BusinessException {
         saveSelective();
         return getBaseMapper().insertSelective(entity);
     }
@@ -67,7 +68,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int update(T entity) {
+    public int update(T entity) throws BusinessException {
         save();
         return getBaseMapper().updateByPrimaryKey(entity);
     }
@@ -80,7 +81,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int updateSelective(T entity) {
+    public int updateSelective(T entity) throws BusinessException {
         saveSelective();
         return getBaseMapper().updateByPrimaryKeySelective(entity);
     }
@@ -141,7 +142,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int delete(T entity) {
+    public int delete(T entity) throws BusinessException {
         if (getBaseComponent().list != null && getBaseComponent().list.size() > 0) {
             for (Object composite : getBaseComponent().list) {
                 ((AbstractComponent) composite).delete();
@@ -158,7 +159,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int deleteByPrimaryKey(Object key) {
+    public int deleteByPrimaryKey(Object key) throws BusinessException {
         return getBaseMapper().deleteByPrimaryKey(key);
     }
 
@@ -170,7 +171,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int deleteByIds(String ids) {
+    public int deleteByIds(String ids) throws BusinessException {
         return getBaseMapper().deleteByIds(ids);
     }
 
@@ -180,7 +181,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param key 主键
      * @return 返回false为不存在，返回true为存在
      */
-    public boolean existsWithPrimaryKey(Object key) {
+    public boolean existsWithPrimaryKey(Object key) throws BusinessException {
         return getBaseMapper().existsWithPrimaryKey(key);
     }
 
@@ -190,7 +191,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param entity 对象实体
      * @return 返回null为未查询到结果，返回对象为查询结果，返回多个结果则抛出异常
      */
-    public T selectOne(T entity) {
+    public T selectOne(T entity) throws BusinessException {
         return getBaseMapper().selectOne(entity);
     }
 
@@ -200,7 +201,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param key 主键
      * @return 返回null为未查询到结果，返回对象为查询结果
      */
-    public T selectByPrimaryKey(Object key) {
+    public T selectByPrimaryKey(Object key) throws BusinessException {
         return getBaseMapper().selectByPrimaryKey(key);
     }
 
@@ -210,7 +211,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param entity 对象实体
      * @return 返回查询结果数量
      */
-    public int selectCount(T entity) {
+    public int selectCount(T entity) throws BusinessException {
         return getBaseMapper().selectCount(entity);
     }
 
@@ -222,7 +223,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findList(T entity, String pageNum, String pageSize) {
+    public List<T> findList(T entity, String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().select(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
@@ -234,7 +235,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findAllList(String pageNum, String pageSize) {
+    public List<T> findAllList(String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().selectAll();
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
@@ -247,7 +248,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findSimpleListByAndCondition(T entity, String pageNum, String pageSize) {
+    public List<T> findSimpleListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().findSimpleListByAndCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
@@ -260,7 +261,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findListByAndCondition(T entity, String pageNum, String pageSize) {
+    public List<T> findListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().findListByAndCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
@@ -273,7 +274,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findSimpleListByORCondition(T entity, String pageNum, String pageSize) {
+    public List<T> findSimpleListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().findSimpleListByORCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
@@ -286,7 +287,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findListByORCondition(T entity, String pageNum, String pageSize) {
+    public List<T> findListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().findListByORCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
