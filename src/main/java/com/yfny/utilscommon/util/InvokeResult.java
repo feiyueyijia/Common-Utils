@@ -17,6 +17,10 @@ public class InvokeResult<T> {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
+    public ConfigurableApplicationContext getApplicationContext() {
+        return this.applicationContext;
+    }
+
     private static InvokeResult invokeResult;
 
     @PostConstruct
@@ -86,7 +90,7 @@ public class InvokeResult<T> {
     /**
      * 执行读取时的返回结果
      *
-     * @param result       数据库读取结果
+     * @param result      数据库读取结果
      * @param failureCode 正常失败编码
      * @return 统一调用响应格式
      */
