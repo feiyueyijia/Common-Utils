@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.yfny</groupId>
     <artifactId>utils-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <packaging>jar</packaging>
 
     <name>utils-common</name>
@@ -24,6 +13,7 @@
 
     <properties>
         <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
+        <nacos-spring.version>0.9.0.RELEASE</nacos-spring.version>
         <aspectjweaver.version>1.8.13</aspectjweaver.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <json.version>20180813</json.version>
@@ -56,6 +46,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <version>${nacos-spring.version}</version>
         </dependency>
         <!-- redis依赖 -->
         <dependency>
@@ -166,5 +161,89 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <filters>
+            <filter>src/main/resources/bootstrap.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <!-- spring maven插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <classifier>exec</classifier>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- 本地开发环境 -->
+            <id>local</id>
+            <activation>
+                <!-- 设置默认激活这个配置 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <environment>local</environment>
+                <nacos.addr>192.168.137.202:8848</nacos.addr>
+                <nacos.namespace>f10a861b-2569-4241-a13d-aa803ab27b7f</nacos.namespace>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 开发测试环境 -->
+            <id>dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <environment>dev</environment>
+                <nacos.addr>192.168.137.202:8848</nacos.addr>
+                <nacos.namespace>58911547-2fd5-4253-9b48-bf7fef4a2b87</nacos.namespace>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 正式测试环境 -->
+            <id>test</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <environment>test</environment>
+                <nacos.addr>192.168.137.202:8848</nacos.addr>
+                <nacos.namespace>dc25f0db-9f1d-4ba4-86c7-2e592897c725</nacos.namespace>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 生产发布环境 -->
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <environment>release</environment>
+                <nacos.addr>192.168.137.202:8848</nacos.addr>
+                <nacos.namespace>4823b8b8-69c5-41ae-918d-80ec4f2ac971</nacos.namespace>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
