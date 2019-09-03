@@ -1,0 +1,19 @@
+##########################################################实体对象配置示例##########################################################
+db:
+  url: jdbc:mysql://127.0.0.1:3306/test_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+  username: root
+  password: root
+author: auto
+packageName: com.yfny.utilscommon
+entityPackageName:
+path:
+  controller:
+  service:
+  entity: entity
+  mapper:
+  future:
+  composite:
+  sqlbuilder:
+  hystrix:
+  basetest:
+  unittest:
