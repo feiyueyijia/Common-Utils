@@ -54,7 +54,7 @@ public class InvokeResult<T> {
     }
 
     public static <T> InvokeResult failure(String code, T data, String... params) {
-        if (params == null) {
+        if (params == null || params.length == 0) {
             params = new String[]{"未知"};
         }
         return getResultInit(code, "", data, FAILURE, params);
@@ -65,7 +65,7 @@ public class InvokeResult<T> {
     }
 
     public static InvokeResult exception(String code, String... params) {
-        if (params == null) {
+        if (params == null || params.length == 0) {
             params = new String[]{"未知"};
         }
         return getResultInit(code, "", null, EXCEPTION, params);
@@ -88,7 +88,7 @@ public class InvokeResult<T> {
         }
         return InvokeResult.failure(failureCode, params);
     }
-    
+
     /**
      * 执行读取时的返回结果
      *
