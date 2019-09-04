@@ -88,33 +88,34 @@ public class InvokeResult<T> {
      *
      * @param result      数据库读取结果
      * @param failureCode 正常失败编码
+     * @param params
      * @return 统一调用响应格式
      */
-    public static InvokeResult readResult(Object result, String failureCode) {
+    public static InvokeResult readResult(Object result, String failureCode, String[] params) {
         if (result != null) {
             return InvokeResult.success("10001", result);
         } else if (result == null) {
             return InvokeResult.failure("10002", "数据不存在或网络请求超时或服务器崩溃");
         }
-        return InvokeResult.failure(failureCode);
+        return InvokeResult.failure(failureCode, params);
     }
 
     /**
      * 执行读取时的返回结果
      *
-     * @param result       数据库读取结果
-     * @param successCode  成功编码
-     * @param failureCode1 非正常失败编码
-     * @param failureCode2 正常失败编码
+     * @param result      数据库读取结果
+     * @param successCode 成功编码
+     * @param failureCode 正常失败编码
+     * @param params
      * @return 统一调用响应格式
      */
-    public static InvokeResult readResult(Object result, String successCode, String failureCode1, String failureCode2) {
+    public static InvokeResult readResult(Object result, String successCode, String failureCode, String[] params) {
         if (result != null) {
             return InvokeResult.success(successCode, result);
         } else if (result == null) {
-            return InvokeResult.failure(failureCode1, "数据不存在或网络请求超时或服务器崩溃");
+            return InvokeResult.failure("10002", "数据不存在或网络请求超时或服务器崩溃");
         }
-        return InvokeResult.failure(failureCode2);
+        return InvokeResult.failure(failureCode, params);
     }
 
     /**
@@ -147,7 +148,7 @@ public class InvokeResult<T> {
      * @param params
      * @return
      */
-    private static String getMsgFromCfg(String code, String[] params) {
+    public static String getMsgFromCfg(String code, String[] params) {
         String message = invokeResult.applicationContext.getEnvironment().getProperty(code);
         return params == null ? message : MessageFormat.format(message,
                 params);
