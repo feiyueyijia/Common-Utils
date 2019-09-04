@@ -54,6 +54,9 @@ public class InvokeResult<T> {
     }
 
     public static <T> InvokeResult failure(String code, T data, String... params) {
+        if (params == null) {
+            params = new String[]{"未知"};
+        }
         return getResultInit(code, "", data, FAILURE, params);
     }
 
@@ -62,45 +65,30 @@ public class InvokeResult<T> {
     }
 
     public static InvokeResult exception(String code, String... params) {
+        if (params == null) {
+            params = new String[]{"未知"};
+        }
         return getResultInit(code, "", null, EXCEPTION, params);
     }
 
     /**
      * 执行写入时的返回结果
      *
-     * @param result       数据库写入结果
-     * @param successCode  成功编码
-     * @param failureCode1 非正常失败编码
-     * @param failureCode2 正常失败编码
-     * @param params
-     * @return 统一调用响应格式
-     */
-    public static InvokeResult writeResult(int result, String successCode, String failureCode1, String failureCode2, String... params) {
-        if (result == 1) {
-            return InvokeResult.success(successCode, result);
-        } else if (result == -1) {
-            return InvokeResult.failure(failureCode1, "网络请求超时或服务器崩溃");
-        }
-        return InvokeResult.failure(failureCode2, params);
-    }
-
-    /**
-     * 执行读取时的返回结果
-     *
-     * @param result      数据库读取结果
+     * @param result      数据库写入结果
+     * @param successCode 成功编码
      * @param failureCode 正常失败编码
      * @param params
      * @return 统一调用响应格式
      */
-    public static InvokeResult readResult(Object result, String failureCode, String... params) {
-        if (result != null) {
-            return InvokeResult.success("10001", result);
-        } else if (result == null) {
-            return InvokeResult.failure("10002", "数据不存在或网络请求超时或服务器崩溃");
+    public static InvokeResult writeResult(int result, String successCode, String failureCode, String... params) {
+        if (result == 1) {
+            return InvokeResult.success(successCode, result);
+        } else if (result == -1) {
+            return InvokeResult.failure("10002", "网络请求超时或服务器崩溃");
         }
         return InvokeResult.failure(failureCode, params);
     }
-
+    
     /**
      * 执行读取时的返回结果
      *

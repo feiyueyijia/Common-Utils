@@ -130,7 +130,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult selectOne(@RequestBody T entity) throws Exception {
         T result = getBaseService().selectOne(entity);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -143,7 +143,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult selectByPrimaryKey(@RequestParam(value = "key") Object key) throws Exception {
         T result = getBaseService().selectByPrimaryKey(key);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -176,7 +176,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult findList(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
         List<T> result = getBaseService().findList(entity, pageNum, pageSize);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -190,7 +190,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult findAllList(@PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
         List<T> result = getBaseService().findAllList(pageNum, pageSize);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -205,7 +205,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult findSimpleListByAndCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
         List<T> result = getBaseService().findSimpleListByAndCondition(entity, pageNum, pageSize);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -220,7 +220,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult findListByAndCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
         List<T> result = getBaseService().findListByAndCondition(entity, pageNum, pageSize);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -235,7 +235,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult findSimpleListByORCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
         List<T> result = getBaseService().findSimpleListByORCondition(entity, pageNum, pageSize);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
     /**
@@ -250,7 +250,7 @@ public abstract class BaseController<T extends BaseEntity> {
     @ResponseBody
     public InvokeResult findListByORCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
         List<T> result = getBaseService().findListByORCondition(entity, pageNum, pageSize);
-        return InvokeResult.readResult(result, "10003");
+        return InvokeResult.readResult(result, "10001", "10003");
     }
 
 }
