@@ -1,8 +1,5 @@
 package com.yfny.utilscommon.util;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.*;
 
 /**
@@ -24,8 +21,9 @@ public class MultipleTreeUtils {
                 Map dataRecord = (Map) it.next();
                 Node node = new Node();
                 node.id = (String) dataRecord.get("id");
-                node.text = (String) dataRecord.get("text");
+                node.label = (String) dataRecord.get("name");
                 node.parentId = (String) dataRecord.get("parentId");
+                node.level = (int) dataRecord.get("level");
                 nodeList.put(node.id, node);
             }
             // 构造无序的多叉树
@@ -58,28 +56,46 @@ public class MultipleTreeUtils {
          */
         private String id;
         /**
-         * 节点内容
+         * 节点标签
          */
-        private String text;
+        private String label;
         /**
          * 父节点编号
          */
         private String parentId;
+        /**
+         * 节点层级
+         */
+        private int level;
         /**
          * 孩子节点列表
          */
         private Children children = new Children();
 
         // 先序遍历，拼接JSON字符串
+//        public String toString() {
+//            String result = "{"
+//                    + "\"id\" : \"" + id + "\""
+//                    + ", \"label\" : \"" + label + "\"";
+//
+//            if (children != null && children.getSize() != 0) {
+//                result += ", \"children\" : " + children.toString();
+//            } else {
+//                result += ", \"children\" : \"[]\"";
+//            }
+//
+//            return result + "}";
+//        }
+
         public String toString() {
             String result = "{"
-                    + "\"id\" : \"" + id + "\""
-                    + ", \"text\" : \"" + text + "\"";
+                    + "id : \'" + id + "\'"
+                    + ", label : \'" + label + "\'";
 
             if (children != null && children.getSize() != 0) {
-                result += ", \"children\" : " + children.toString();
+                result += ", children : " + children.toString();
             } else {
-                result += ", \"children\" : \"[]\"";
+                result += ", children : []";
             }
 
             return result + "}";
@@ -142,47 +158,36 @@ public class MultipleTreeUtils {
     static class NodeIDComparator implements Comparator {
         // 按照节点编号比较
         public int compare(Object o1, Object o2) {
-            int j1 = Integer.parseInt(((Node) o1).id);
-            int j2 = Integer.parseInt(((Node) o2).id);
+//            int j1 = Integer.parseInt(((Node) o1).id);
+//            int j2 = Integer.parseInt(((Node) o2).id);
+            int j1 = ((Node) o1).level;
+            int j2 = ((Node) o2).level;
             return (Integer.compare(j1, j2));
         }
     }
 
-    /**
-     * 获取目录树
-     *
-     * @param dataList 数据列表
-     * @return json字符串
-     */
-    public static String getTree(List dataList) {
-        String result = "";
-        if (dataList != null && dataList.size() > 0) {
-            // 节点列表（散列表，用于临时存储节点对象）
-            JSONArray json = new JSONArray();
-            // 根据结果集构造节点列表（存入散列表）
-            for (Iterator it = dataList.iterator(); it.hasNext(); ) {
-                Map dataRecord = (Map) it.next();
-                JSONObject jo = new JSONObject();
-                jo.put("id", (String) dataRecord.get("id"));
-                jo.put("text", (String) dataRecord.get("text"));
-//                jo.put("state", (String) dataRecord.get("state"));
-//                jo.put("type",(String)dataRecord.get("type"));
-//                jo.put("status",(String)dataRecord.get("status"));
-//                jo.put("iconCls",(String)dataRecord.get("iconCls"));
-//                jo.put("number",(String)dataRecord.get("number"));
-//                jo.put("description",(String)dataRecord.get("description"));
-//                jo.put("path",(String)dataRecord.get("path"));
-//                jo.put("metaModelId",dataRecord.get("metaModelId"));
-//                jo.put("metaModelName",dataRecord.get("metaModelName"));
-//                jo.put("fileName",dataRecord.get("fileName"));
-//                jo.put("createBy",dataRecord.get("createBy"));
-//                jo.put("modelType",dataRecord.get("modelType"));
-//                jo.put("count",dataRecord.get("count"));
-                json.put(jo);
-            }
-            result = json.toString();
-        }
-        return result;
+    public static void main(String[] args) {
+        exapmle();
     }
+
+    public static void exapmle() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String[] ids = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        String[] names = {"项目名称", "一级功能1", "一级功能2", "二级功能1", "二级功能2", "二级功能3", "二级功能4", "三级功能1", "三级功能2"};
+        String[] parentIds = {"", "1", "1", "2", "2", "3", "3", "4", "4"};
+        int[] levels = {0, 1, 1, 2, 2, 2, 2, 3, 3};
+
+        for (int i = 0; i < ids.length; i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", ids[i]);
+            map.put("name", names[i]);
+            map.put("parentId", parentIds[i]);
+            map.put("level", levels[i]);
+            list.add(map);
+        }
+        Object treeList = MultipleTreeUtils.getTreeList(list);
+        System.out.println(treeList);
+    }
+
 }
 
