@@ -8,22 +8,14 @@ import com.yfny.utilscommon.basemvc.common.BusinessException;
  * Author jisongZhou
  * Date  2019-09-10
  */
-public class BaseValid<T extends BaseEntity> {
+public interface BaseValid<T extends BaseEntity> {
 
-    public void validInsert(T entity) throws BusinessException {
+    public void validInsert(T entity) throws BusinessException;
 
-    }
+    public void validUpdate(T entity) throws BusinessException;
 
-    public void validUpdate(T entity) throws BusinessException {
+    public void validDelete(T entity) throws BusinessException;
 
-    }
-
-    public void validDelete(T entity) throws BusinessException {
-
-    }
-
-    public void validSelect(T entity) throws BusinessException {
-
-    }
+    public void validSelect(T entity) throws BusinessException;
 
 }
