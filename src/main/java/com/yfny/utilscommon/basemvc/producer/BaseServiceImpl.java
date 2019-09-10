@@ -34,6 +34,13 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
         return this.baseMapper;
     }
 
+    @Autowired
+    private BaseValid<T> baseValid;
+
+    public BaseValid getBaseValid() {
+        return this.baseValid;
+    }
+
     /**
      * 保存一个实体，null的属性也会保存，不会使用数据库默认值
      *
@@ -43,6 +50,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int insert(T entity) throws BusinessException {
+        getBaseValid().validInsert(entity);
         save();
         return getBaseMapper().insert(entity);
     }
@@ -56,6 +64,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int insertSelective(T entity) throws BusinessException {
+        getBaseValid().validInsert(entity);
         saveSelective();
         return getBaseMapper().insertSelective(entity);
     }
@@ -69,6 +78,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int update(T entity) throws BusinessException {
+        getBaseValid().validUpdate(entity);
         save();
         return getBaseMapper().updateByPrimaryKey(entity);
     }
@@ -82,6 +92,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int updateSelective(T entity) throws BusinessException {
+        getBaseValid().validUpdate(entity);
         saveSelective();
         return getBaseMapper().updateByPrimaryKeySelective(entity);
     }
@@ -143,6 +154,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int delete(T entity) throws BusinessException {
+        getBaseValid().validDelete(entity);
         if (getBaseComponent().list != null && getBaseComponent().list.size() > 0) {
             for (Object composite : getBaseComponent().list) {
                 ((AbstractComponent) composite).delete();
@@ -192,6 +204,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      * @return 返回null为未查询到结果，返回对象为查询结果，返回多个结果则抛出异常
      */
     public T selectOne(T entity) throws BusinessException {
+        getBaseValid().validSelect(entity);
         return getBaseMapper().selectOne(entity);
     }
 
