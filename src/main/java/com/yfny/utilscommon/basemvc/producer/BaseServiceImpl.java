@@ -248,8 +248,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findSimpleListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException {
-        PageResultStrategy pageResultStrategy = () -> getBaseMapper().findSimpleListByAndCondition(entity);
+    public List<T> findListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException {
+        PageResultStrategy pageResultStrategy = () -> getBaseMapper().findListByAndCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
 
@@ -261,21 +261,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    public List<T> findListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException {
-        PageResultStrategy pageResultStrategy = () -> getBaseMapper().findListByAndCondition(entity);
-        return findPageResultList(pageResultStrategy, pageNum, pageSize);
-    }
-
-    /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，亦或查询取并集，分页返回
-     *
-     * @param entity   对象实体
-     * @param pageNum  页数
-     * @param pageSize 每页数量
-     * @return 返回对象列表为查询结果
-     */
-    public List<T> findSimpleListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException {
-        PageResultStrategy pageResultStrategy = () -> getBaseMapper().findSimpleListByORCondition(entity);
+    public List<T> findComplexListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException {
+        PageResultStrategy pageResultStrategy = () -> getBaseMapper().findComplexListByAndCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
 
@@ -289,6 +276,19 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     public List<T> findListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException {
         PageResultStrategy pageResultStrategy = () -> getBaseMapper().findListByORCondition(entity);
+        return findPageResultList(pageResultStrategy, pageNum, pageSize);
+    }
+
+    /**
+     * 根据实体中的属性值进行查询，查询条件使用LIKE，亦或查询取并集，分页返回
+     *
+     * @param entity   对象实体
+     * @param pageNum  页数
+     * @param pageSize 每页数量
+     * @return 返回对象列表为查询结果
+     */
+    public List<T> findComplexListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException {
+        PageResultStrategy pageResultStrategy = () -> getBaseMapper().findComplexListByORCondition(entity);
         return findPageResultList(pageResultStrategy, pageNum, pageSize);
     }
 

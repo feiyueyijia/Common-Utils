@@ -14,12 +14,14 @@ import java.util.List;
 @tk.mybatis.mapper.annotation.RegisterMapper
 public interface BaseMapper<T> extends Mapper<T>, MySqlMapper<T>, IdsMapper<T> {
 
-    List<T> findSimpleListByAndCondition(T entity);
-
     List<T> findListByAndCondition(T entity);
 
-    List<T> findSimpleListByORCondition(T entity);
+    List<T> findComplexListByAndCondition(T entity);
 
     List<T> findListByORCondition(T entity);
+
+    List<T> findComplexListByORCondition(T entity);
+
+    T selectComplexById(String id);
 
 }

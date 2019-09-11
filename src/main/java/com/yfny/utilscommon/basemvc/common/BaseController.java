@@ -201,10 +201,10 @@ public abstract class BaseController<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    @PostMapping(value = {"/findSimpleListByAndCondition", "/findSimpleListByAndCondition/{pageNum}/{pageSize}"})
+    @PostMapping(value = {"/findListByAndCondition", "/findListByAndCondition/{pageNum}/{pageSize}"})
     @ResponseBody
-    public InvokeResult findSimpleListByAndCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
-        List<T> result = getBaseService().findSimpleListByAndCondition(entity, pageNum, pageSize);
+    public InvokeResult findListByAndCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
+        List<T> result = getBaseService().findListByAndCondition(entity, pageNum, pageSize);
         return InvokeResult.readResult(result, "10001", "10003");
     }
 
@@ -216,10 +216,10 @@ public abstract class BaseController<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    @PostMapping(value = {"/findListByAndCondition", "/findListByAndCondition/{pageNum}/{pageSize}"})
+    @PostMapping(value = {"/findComplexListByAndCondition", "/findComplexListByAndCondition/{pageNum}/{pageSize}"})
     @ResponseBody
-    public InvokeResult findListByAndCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
-        List<T> result = getBaseService().findListByAndCondition(entity, pageNum, pageSize);
+    public InvokeResult findComplexListByAndCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
+        List<T> result = getBaseService().findComplexListByAndCondition(entity, pageNum, pageSize);
         return InvokeResult.readResult(result, "10001", "10003");
     }
 
@@ -231,10 +231,10 @@ public abstract class BaseController<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    @PostMapping(value = {"/findSimpleListByORCondition", "/findSimpleListByORCondition/{pageNum}/{pageSize}"})
+    @PostMapping(value = {"/findComplexListByORCondition", "/findComplexListByORCondition/{pageNum}/{pageSize}"})
     @ResponseBody
     public InvokeResult findSimpleListByORCondition(@RequestBody T entity, @PathVariable(value = "pageNum", required = false) String pageNum, @PathVariable(value = "pageSize", required = false) String pageSize) throws Exception {
-        List<T> result = getBaseService().findSimpleListByORCondition(entity, pageNum, pageSize);
+        List<T> result = getBaseService().findComplexListByORCondition(entity, pageNum, pageSize);
         return InvokeResult.readResult(result, "10001", "10003");
     }
 

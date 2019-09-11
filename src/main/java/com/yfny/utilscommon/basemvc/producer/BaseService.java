@@ -127,7 +127,7 @@ public interface BaseService<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    List<T> findSimpleListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException;
+    List<T> findListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException;
 
     /**
      * 根据实体中的属性值进行查询，查询条件使用LIKE，并列查询取交集，分页返回
@@ -137,17 +137,7 @@ public interface BaseService<T extends BaseEntity> {
      * @param pageSize 每页数量
      * @return 返回对象列表为查询结果
      */
-    List<T> findListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException;
-
-    /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，亦或查询取并集，分页返回
-     *
-     * @param entity   对象实体
-     * @param pageNum  页数
-     * @param pageSize 每页数量
-     * @return 返回对象列表为查询结果
-     */
-    List<T> findSimpleListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException;
+    List<T> findComplexListByAndCondition(T entity, String pageNum, String pageSize) throws BusinessException;
 
     /**
      * 根据实体中的属性值进行查询，查询条件使用LIKE，亦或查询取并集，分页返回
@@ -158,5 +148,15 @@ public interface BaseService<T extends BaseEntity> {
      * @return 返回对象列表为查询结果
      */
     List<T> findListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException;
+
+    /**
+     * 根据实体中的属性值进行查询，查询条件使用LIKE，亦或查询取并集，分页返回
+     *
+     * @param entity   对象实体
+     * @param pageNum  页数
+     * @param pageSize 每页数量
+     * @return 返回对象列表为查询结果
+     */
+    List<T> findComplexListByORCondition(T entity, String pageNum, String pageSize) throws BusinessException;
 
 }
