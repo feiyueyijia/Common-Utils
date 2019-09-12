@@ -37,6 +37,15 @@ public class BaseEntity implements Serializable {
     @Transient
     private Map<String, String> orders;//排序字段及排序方式（升序，降序）
 
+    @Transient
+    private String param1;//备用参数1
+
+    @Transient
+    private String param2;//备用参数1
+
+    @Transient
+    private String param3;//备用参数1
+
     public BaseEntity() {
 
     }
@@ -89,4 +98,27 @@ public class BaseEntity implements Serializable {
         this.orders = orders;
     }
 
+    public String getParam1() {
+        return param1;
+    }
+
+    public void setParam1(String param1) {
+        this.param1 = param1;
+    }
+
+    public String getParam2() {
+        return param2;
+    }
+
+    public void setParam2(String param2) {
+        this.param2 = param2;
+    }
+
+    public String getParam3() {
+        return param3;
+    }
+
+    public void setParam3(String param3) {
+        this.param3 = param3;
+    }
 }
