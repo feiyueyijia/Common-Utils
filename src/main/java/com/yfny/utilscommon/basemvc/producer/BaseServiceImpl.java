@@ -43,7 +43,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int insert(T entity) throws BusinessException {
-        save();
+        save(getBaseComponent());
         return getBaseMapper().insert(entity);
     }
 
@@ -56,7 +56,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int insertSelective(T entity) throws BusinessException {
-        saveSelective();
+        saveSelective(getBaseComponent());
         return getBaseMapper().insertSelective(entity);
     }
 
@@ -69,7 +69,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int update(T entity) throws BusinessException {
-        save();
+        save(getBaseComponent());
         return getBaseMapper().updateByPrimaryKey(entity);
     }
 
@@ -82,30 +82,32 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
     public int updateSelective(T entity) throws BusinessException {
-        saveSelective();
+        saveSelective(getBaseComponent());
         return getBaseMapper().updateByPrimaryKeySelective(entity);
     }
 
     /**
      * 保存一个实体，null的属性也会保存，不会使用数据库默认值
      */
-    private void save() {
-        if (getBaseComponent().list != null && getBaseComponent().list.size() > 0) {
-            for (Object composite : getBaseComponent().list) {
-                int action = ((BaseEntity) ((AbstractComponent) composite).getParam()).getAction();
+    private void save(Object object) {
+        BaseComponent composite = ((BaseComponent) object);
+        if (composite.list != null && composite.list.size() > 0) {
+            for (Object subComposite : composite.list) {
+                int action = ((BaseEntity) ((AbstractComponent) subComposite).getParam()).getAction();
                 switch (action) {
                     case BaseEntity.INSERT:
-                        ((AbstractComponent) composite).insert();
+                        ((AbstractComponent) subComposite).insert();
                         break;
                     case BaseEntity.UPDATE:
-                        ((AbstractComponent) composite).update();
+                        ((AbstractComponent) subComposite).update();
                         break;
                     case BaseEntity.DELETE:
-                        ((AbstractComponent) composite).delete();
+                        ((AbstractComponent) subComposite).delete();
                         break;
                     default:
                         break;
                 }
+                saveSelective(subComposite);
             }
         }
     }
@@ -113,23 +115,25 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     /**
      * 保存一个实体，null的属性不会保存，会使用数据库默认值
      */
-    private void saveSelective() {
-        if (getBaseComponent().list != null && getBaseComponent().list.size() > 0) {
-            for (Object composite : getBaseComponent().list) {
-                int action = ((BaseEntity) ((AbstractComponent) composite).getParam()).getAction();
+    private void saveSelective(Object object) {
+        BaseComponent composite = ((BaseComponent) object);
+        if (composite.list != null && composite.list.size() > 0) {
+            for (Object subComposite : composite.list) {
+                int action = ((BaseEntity) ((AbstractComponent) subComposite).getParam()).getAction();
                 switch (action) {
                     case BaseEntity.INSERT:
-                        ((AbstractComponent) composite).insertSelective();
+                        ((AbstractComponent) subComposite).insertSelective();
                         break;
                     case BaseEntity.UPDATE:
-                        ((AbstractComponent) composite).updateSelective();
+                        ((AbstractComponent) subComposite).updateSelective();
                         break;
                     case BaseEntity.DELETE:
-                        ((AbstractComponent) composite).delete();
+                        ((AbstractComponent) subComposite).delete();
                         break;
                     default:
                         break;
                 }
+                saveSelective(subComposite);
             }
         }
     }
