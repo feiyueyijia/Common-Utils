@@ -101,19 +101,19 @@ public class BeforeBaseServiceImpl {
                     ((AbstractComponent) composite).add((AbstractComponent) subComposite);
                 }
             } else {
-                if (action == BaseEntity.DELETE) {
-                    //此情况下只获取到主体对象关键参数（一般为主键），无法递归取到所有层级的值
-                    Field field = ReflectUtils.getDeclaredField(param, filedName);
-                    String typeName = field.getGenericType().getTypeName();
-                    if ("List".equals(field.getType().getSimpleName())) {
-                        typeName = typeName.substring(typeName.indexOf("<") + 1, typeName.lastIndexOf(">"));
-                    }
-                    Object subEntity = ReflectUtils.createInstance(typeName);
-                    //创建设置子容器构件
-                    Object subComposite = setSubComposite(subEntity, pkValue);
-                    //将子对象容器构件加入抽象构件
-                    ((AbstractComponent) composite).add((AbstractComponent) subComposite);
-                }
+//                if (action == BaseEntity.DELETE) {
+//                    //此情况下只获取到主体对象关键参数（一般为主键），无法递归取到所有层级的值
+//                    Field field = ReflectUtils.getDeclaredField(param, filedName);
+//                    String typeName = field.getGenericType().getTypeName();
+//                    if ("List".equals(field.getType().getSimpleName())) {
+//                        typeName = typeName.substring(typeName.indexOf("<") + 1, typeName.lastIndexOf(">"));
+//                    }
+//                    Object subEntity = ReflectUtils.createInstance(typeName);
+//                    //创建设置子容器构件
+//                    Object subComposite = setSubComposite(subEntity, pkValue);
+//                    //将子对象容器构件加入抽象构件
+//                    ((AbstractComponent) composite).add((AbstractComponent) subComposite);
+//                }
             }
         }
     }
