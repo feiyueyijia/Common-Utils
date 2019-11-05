@@ -1,5 +1,6 @@
 package com.yfny.utilscommon.generator.invoker;
 
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.invoker.base.AbstractBuilder;
 import com.yfny.utilscommon.generator.invoker.base.AbstractInvoker;
 import com.yfny.utilscommon.generator.invoker.base.Invoker;
@@ -16,34 +17,19 @@ public class SingleInvoker extends AbstractInvoker {
 
     @Override
     protected void getTableInfos() throws SQLException {
-        tableInfos = connectionUtil.getMetaData(tableName);
+        tableInfos = connectionUtil.getMetaData(materials.getTableName());
     }
 
     @Override
     protected void initTasks() {
-        taskQueue.initSingleTasks(className, tableName, description, tableInfos, foreignKey);
+        taskQueue.initSingleTasks(materials, tableInfos);
     }
 
     public static class Builder extends AbstractBuilder {
         private SingleInvoker invoker = new SingleInvoker();
 
-        public Builder setTableName(String tableName) {
-            invoker.setTableName(tableName);
-            return this;
-        }
-
-        public Builder setClassName(String className) {
-            invoker.setClassName(className);
-            return this;
-        }
-
-        public Builder setDescription(String description) {
-            invoker.setDescription(description);
-            return this;
-        }
-
-        public Builder setForeignKey(String foreignKey) {
-            invoker.setForeignKey(foreignKey);
+        public Builder setMaterials(BCodeMaterials materials) {
+            invoker.setMaterials(materials);
             return this;
         }
 
@@ -57,11 +43,11 @@ public class SingleInvoker extends AbstractInvoker {
 
         @Override
         public void checkBeforeBuild() throws Exception {
-            if (StringUtil.isBlank(invoker.getTableName())) {
+            if (StringUtil.isBlank(invoker.getMaterials().getTableName())) {
                 throw new Exception("Expect table's name, but get a blank String.");
             }
-            if (StringUtil.isBlank(invoker.getClassName())) {
-                invoker.setClassName(GeneratorUtil.generateClassName(invoker.getTableName()));
+            if (StringUtil.isBlank(invoker.getMaterials().getClassName())) {
+                invoker.getMaterials().setClassName(GeneratorUtil.generateClassName(invoker.getMaterials().getTableName()));
             }
         }
     }

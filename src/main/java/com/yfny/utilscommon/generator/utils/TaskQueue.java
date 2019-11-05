@@ -1,21 +1,28 @@
 package com.yfny.utilscommon.generator.utils;
 
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.entity.ColumnInfo;
-import com.yfny.utilscommon.generator.invoker.RelationInvoker;
-import com.yfny.utilscommon.generator.task.APIBaseTestTask;
-import com.yfny.utilscommon.generator.task.APIUnitTestTask;
-import com.yfny.utilscommon.generator.task.EntityAddTask;
-import com.yfny.utilscommon.generator.task.EntityTask;
 import com.yfny.utilscommon.generator.task.base.AbstractTask;
-import com.yfny.utilscommon.generator.task.consumer.ConsumerClientTask;
-import com.yfny.utilscommon.generator.task.consumer.ConsumerControllerTask;
-import com.yfny.utilscommon.generator.task.consumer.ConsumerFutureTask;
-import com.yfny.utilscommon.generator.task.consumer.ConsumerHystrixTask;
-import com.yfny.utilscommon.generator.task.producer.*;
+import com.yfny.utilscommon.generator.task.frame.*;
+import com.yfny.utilscommon.generator.task.scheme.aspect.BeforeServiceImplTask;
+import com.yfny.utilscommon.generator.task.scheme.builder.SqlBuilderTask;
+import com.yfny.utilscommon.generator.task.scheme.composite.CompositeTask;
+import com.yfny.utilscommon.generator.task.scheme.constant.ConstantTask;
+import com.yfny.utilscommon.generator.task.scheme.controller.ControllerTask;
+import com.yfny.utilscommon.generator.task.scheme.entity.EntityAddTask;
+import com.yfny.utilscommon.generator.task.scheme.entity.EntityTask;
+import com.yfny.utilscommon.generator.task.scheme.fallback.HystrixTask;
+import com.yfny.utilscommon.generator.task.scheme.handler.ExceptionHandlerTask;
+import com.yfny.utilscommon.generator.task.scheme.mapper.MapperAddTask;
+import com.yfny.utilscommon.generator.task.scheme.mapper.MapperTask;
+import com.yfny.utilscommon.generator.task.scheme.service.ClientTask;
+import com.yfny.utilscommon.generator.task.scheme.service.ServiceImplTask;
+import com.yfny.utilscommon.generator.task.scheme.service.ServiceTask;
+import com.yfny.utilscommon.generator.task.scheme.test.APIBaseTestTask;
+import com.yfny.utilscommon.generator.task.scheme.valid.ValidTask;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 代码生成器任务执行
@@ -27,72 +34,49 @@ public class TaskQueue {
 
     /******************************************************此下方法为改造新增开始*****************************************************************/
 
-    public void initSingleTasks(String className, String tableName, String description, List<ColumnInfo> tableInfos, String foreignKey) {
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getEntity())) {
-            taskQueue.add(new EntityTask(className, tableName, description, tableInfos, foreignKey));
+    public void initFrameTasks(int type) {
+        taskQueue.add(new GitIgnoreTask(type));
+        taskQueue.add(new ReadMeTask(type));
+        taskQueue.add(new PomTask(type));
+        if (type == FileUtil.PRODUCER) {
+            taskQueue.add(new MainApplicationTask(type));
+            taskQueue.add(new MainYamlTask(type));
+            taskQueue.add(new MainBootstrapTask(type));
+            taskQueue.add(new TestApplicationTask(type));
+            taskQueue.add(new TestYamlTask(type));
+            taskQueue.add(new BeforeServiceImplTask());
+            taskQueue.add(new ExceptionHandlerTask());
+            taskQueue.add(new APIBaseTestTask());
         }
     }
 
-    public void initProducerTasks(String className, String tableName, String description, List<ColumnInfo> tableInfos, boolean isFirst) {
-        if (isFirst) {
-            taskQueue.add(new ProducerBeforeServiceImplTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getSqlbuilder())) {
-            taskQueue.add(new ProducerSqlBuilderTask(className, tableName, description, tableInfos));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getMapper())) {
-            taskQueue.add(new ProducerMapperTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getService())) {
-            taskQueue.add(new ProducerServiceImplTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getComposite())) {
-            taskQueue.add(new ProducerCompositeTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getFuture())) {
-            taskQueue.add(new ProducerFutureTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getController())) {
-            taskQueue.add(new ProducerControllerTask(className, description));
-        }
+    public void initSingleTasks(BCodeMaterials materials, List<ColumnInfo> tableInfos) {
+        taskQueue.add(new EntityTask(materials, tableInfos));
+        taskQueue.add(new ConstantTask(materials));
     }
 
-    public void initConsumerTasks(String className, String description, String applicationName) {
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getService())) {
-            taskQueue.add(new ConsumerClientTask(className, description, applicationName));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getHystrix())) {
-            taskQueue.add(new ConsumerHystrixTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getFuture())) {
-            taskQueue.add(new ConsumerFutureTask(className, description));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getController())) {
-            taskQueue.add(new ConsumerControllerTask(className, description));
-        }
+    public void initProducerTasks(BCodeMaterials materials, List<ColumnInfo> tableInfos) {
+        taskQueue.add(new SqlBuilderTask(materials, tableInfos));
+        taskQueue.add(new MapperTask(materials));
+        taskQueue.add(new ServiceTask(materials));
+        taskQueue.add(new ServiceImplTask(materials));
+        taskQueue.add(new CompositeTask(materials));
+        taskQueue.add(new ValidTask(materials));
+        taskQueue.add(new ControllerTask(materials));
     }
 
-    public void initRelationTasks(String className, String foreignKey, Map<String, String> relationClassNameMap, String writeType) {
-        if (RelationInvoker.Builder.ENTITY_FILE.equals(writeType)) {
-            if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getEntity())) {
-                taskQueue.add(new EntityAddTask(className, relationClassNameMap));
-            }
-        } else if (RelationInvoker.Builder.PRODUCER_FILE.equals(writeType)) {
-            if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getMapper())) {
-                taskQueue.add(new ProducerMapperAddTask(className, foreignKey, relationClassNameMap));
-            }
-        } else if (RelationInvoker.Builder.CONSUMER_FILE.equals(writeType)) {
-
-        }
+    public void initConsumerTasks(BCodeMaterials materials) {
+        taskQueue.add(new ClientTask(materials));
+        taskQueue.add(new HystrixTask(materials));
     }
 
-    public void initTestTasks(String className) {
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getBasetest())) {
-            taskQueue.add(new APIBaseTestTask(className));
-        }
-        if (!StringUtil.isBlank(ConfigUtil.getConfiguration().getPath().getUnittest())) {
-            taskQueue.add(new APIUnitTestTask(className));
-        }
+    public void initRelationTasks(List<BCodeMaterials> materialList) {
+        taskQueue.add(new EntityAddTask(materialList));
+        taskQueue.add(new MapperAddTask(materialList));
+    }
+
+    public void initTestTasks() {
+        //taskQueue.add(new APIUnitTestTask());
     }
 
     /******************************************************此下方法为改造新增结束*****************************************************************/

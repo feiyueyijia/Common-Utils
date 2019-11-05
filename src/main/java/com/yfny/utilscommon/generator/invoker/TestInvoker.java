@@ -18,7 +18,7 @@ public class TestInvoker extends AbstractInvoker {
 
     @Override
     protected void initTasks() {
-        taskQueue.initTestTasks(className);
+        taskQueue.initTestTasks();
     }
 
     public static class Builder extends AbstractBuilder {

@@ -28,15 +28,20 @@
     </properties>
 
     <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <name>nexus-releases</name>
-            <url>http://192.168.137.201:8082/repository/maven-releases/</url>
-        </repository>
+        <!--<repository>-->
+            <!--<id>nexus-releases</id>-->
+            <!--<name>nexus-releases</name>-->
+            <!--<url>http://192.168.137.201:8082/repository/maven-releases/</url>-->
+        <!--</repository>-->
+        <!--<snapshotRepository>-->
+            <!--<id>nexus-snapshots</id>-->
+            <!--<name>nexus-snapshots</name>-->
+            <!--<url>http://192.168.137.201:8082/repository/maven-snapshots/</url>-->
+        <!--</snapshotRepository>-->
         <snapshotRepository>
             <id>nexus-snapshots</id>
             <name>nexus-snapshots</name>
-            <url>http://192.168.137.201:8082/repository/maven-snapshots/</url>
+            <url>http://192.168.8.236:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -147,6 +152,12 @@
         </dependency>
         <!--导入导出excel依赖结束-->
 
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
         <!-- 单元测试依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -204,8 +215,10 @@
             </activation>
             <properties>
                 <environment>local</environment>
-                <nacos.addr>192.168.137.202:8848</nacos.addr>
-                <nacos.namespace>f10a861b-2569-4241-a13d-aa803ab27b7f</nacos.namespace>
+                <!--<nacos.addr>192.168.8.233:38848</nacos.addr>-->
+                <!--<nacos.namespace>576f8824-5af7-45ff-97c4-c90080208e1e</nacos.namespace>-->
+                <nacos.addr>console.nacos.io:80</nacos.addr>
+                <nacos.namespace>bd44c3c6-de07-4537-b0dd-b20d98d734f5</nacos.namespace>
             </properties>
         </profile>
         <profile>

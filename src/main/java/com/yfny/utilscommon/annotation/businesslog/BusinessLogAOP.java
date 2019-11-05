@@ -28,7 +28,7 @@ public class BusinessLogAOP implements Ordered {
 
     private final Logger logger = LoggerFactory.getLogger(BusinessLogAOP.class);
 
-    private static PropertiesLoader logmanager = new PropertiesLoader("props/businesslog.properties");
+    private static PropertiesLoader logmanager = new PropertiesLoader("props/business_log.properties");
 
     private Instant beforeTime = null;
 

@@ -53,13 +53,9 @@ public class TypeUtil {
                 sb.append("String");
                 break;
             case Types.DATE:
-                sb.append("Date");
-                break;
             case Types.TIME:
-                sb.append("Time");
-                break;
             case Types.TIMESTAMP:
-                sb.append("Timestamp");
+                sb.append("Date");
                 break;
             case Types.NCLOB:
             case Types.CLOB:

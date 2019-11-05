@@ -1,6 +1,8 @@
 package com.yfny.utilscommon.basemvc.consumer;
 
-import java.util.List;
+import com.yfny.utilscommon.util.InvokeResult;
+import com.yfny.utilscommon.util.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * 服务消费者通用Hystrix
@@ -9,86 +11,83 @@ import java.util.List;
  */
 public abstract class BaseHystrix<T> implements BaseClient<T> {
 
-    @Override
-    public int insert(T entity) { return -1; }
+    @Value("${spring.application.name}")
+    private String applicationName;
 
-    @Override
-    public int insertSelective(T entity) { return -1; }
+    private String getApplicationName() {
+        if (StringUtils.isBlank(applicationName)) {
+            applicationName = "未知服务";
+        }
+        return applicationName;
+    }
 
-    @Override
-    public int update(T entity) { return -1; }
-
-    @Override
-    public int updateSelective(T entity) { return -1; }
-
-    @Override
-    public int delete(T entity) { return -1; }
-
-    @Override
-    public int deleteByPrimaryKey(Object key) { return -1; }
-
-    @Override
-    public boolean existsWithPrimaryKey(Object key) { return false; }
-
-    @Override
-    public T selectOne(T entity) { return null; }
-
-    @Override
-    public T selectByPrimaryKey(Object key) { return null; }
-
-    @Override
-    public int selectCount(T entity) { return -1; }
-
-    @Override
-    public List<T> findList(T entity) { return null; }
-
-    @Override
-    public List<T> findList(T entity, String pageNum, String pageSize) { return null; }
-
-    @Override
-    public List<T> findAllList() { return null; }
-
-    @Override
-    public List<T> findAllList(String pageNum, String pageSize) { return null; }
-
-    @Override
-    public List<T> findSimpleListByAndCondition(T entity) {
-        return null;
+    private InvokeResult fallback() {
+        applicationName = getApplicationName();
+        return InvokeResult.fallback(applicationName);
     }
 
     @Override
-    public List<T> findSimpleListByAndCondition(T entity, String pageNum, String pageSize) {
-        return null;
+    public InvokeResult insertSelective(T entity) {
+        return fallback();
+    }
+    
+    @Override
+    public InvokeResult updateSelective(T entity) {
+        return fallback();
     }
 
     @Override
-    public List<T> findListByAndCondition(T entity) {
-        return null;
+    public InvokeResult delete(T entity) {
+        return fallback();
     }
 
     @Override
-    public List<T> findListByAndCondition(T entity, String pageNum, String pageSize) {
-        return null;
+    public InvokeResult deleteByPrimaryKey(Object key) {
+        return fallback();
     }
 
     @Override
-    public List<T> findSimpleListByORCondition(T entity) {
-        return null;
+    public InvokeResult existsWithPrimaryKey(Object key) {
+        return fallback();
     }
 
     @Override
-    public List<T> findSimpleListByORCondition(T entity, String pageNum, String pageSize) {
-        return null;
+    public InvokeResult selectOne(T entity) {
+        return fallback();
     }
 
     @Override
-    public List<T> findListByORCondition(T entity) {
-        return null;
+    public InvokeResult selectByPrimaryKey(Object key) {
+        return fallback();
     }
 
     @Override
-    public List<T> findListByORCondition(T entity, String pageNum, String pageSize) {
-        return null;
+    public InvokeResult selectComplexById(String id) {
+        return fallback();
     }
 
+    @Override
+    public InvokeResult selectCount(T entity) {
+        return fallback();
+    }
+
+    @Override
+    public InvokeResult findList(T entity) {
+        return fallback();
+    }
+
+    @Override
+    public InvokeResult findList(T entity, String pageNum, String pageSize) {
+        return fallback();
+    }
+
+    @Override
+    public InvokeResult findMapGroupByCondition(T entity) {
+        return fallback();
+    }
+
+    @Override
+    public InvokeResult getTreeOf(T entity) {
+        return fallback();
+    }
 }

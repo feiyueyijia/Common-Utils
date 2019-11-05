@@ -1,5 +1,6 @@
 package com.yfny.utilscommon.generator.invoker;
 
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.invoker.base.AbstractBuilder;
 import com.yfny.utilscommon.generator.invoker.base.AbstractInvoker;
 import com.yfny.utilscommon.generator.invoker.base.Invoker;
@@ -15,35 +16,20 @@ public class ProducerInvoker extends AbstractInvoker {
 
     @Override
     protected void getTableInfos() throws SQLException {
-        tableInfos = connectionUtil.getMetaData(tableName);
+        tableInfos = connectionUtil.getMetaData(materials.getTableName());
     }
 
     @Override
     protected void initTasks() {
-        taskQueue.initProducerTasks(className, tableName, description, tableInfos, first);
+        taskQueue.initProducerTasks(materials, tableInfos);
     }
 
     public static class Builder extends AbstractBuilder {
 
         private ProducerInvoker invoker = new ProducerInvoker();
 
-        public Builder setTableName(String tableName) {
-            invoker.setTableName(tableName);
-            return this;
-        }
-
-        public Builder setClassName(String className) {
-            invoker.setClassName(className);
-            return this;
-        }
-
-        public Builder setDescription(String description) {
-            invoker.setDescription(description);
-            return this;
-        }
-
-        public Builder setFirst(boolean isFirst) {
-            invoker.setFirst(isFirst);
+        public Builder setMaterials(BCodeMaterials materials) {
+            invoker.setMaterials(materials);
             return this;
         }
 
@@ -57,7 +43,7 @@ public class ProducerInvoker extends AbstractInvoker {
 
         @Override
         public void checkBeforeBuild() throws Exception {
-            if (StringUtil.isBlank(invoker.getClassName())) {
+            if (StringUtil.isBlank(invoker.getMaterials().getClassName())) {
                 throw new Exception("ClassName can not be null, please set className.");
             }
         }

@@ -22,6 +22,8 @@ public interface BaseMapper<T> extends Mapper<T>, MySqlMapper<T>, IdsMapper<T> {
 
     List<T> findComplexListByORCondition(T entity);
 
+    List<String> findGroupBy(T function);
+
     T selectComplexById(String id);
 
 }

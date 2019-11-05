@@ -1,5 +1,7 @@
 package com.yfny.utilscommon.generator.entity;
 
+import com.yfny.utilscommon.util.StringUtils;
+
 import java.io.Serializable;
 
 /**
@@ -9,7 +11,7 @@ import java.io.Serializable;
 public class Configuration implements Serializable {
     private String author;
     private String packageName;
-    private String entityPackageName;//新增属性--实体对象包名
+    private String projectName;
     private Path path;
     private Db db;
 
@@ -22,23 +24,28 @@ public class Configuration implements Serializable {
     }
 
     public String getPackageName() {
-        return packageName == null ? "" : packageName + ".";
+        return packageName == null ? "" : packageName;
     }
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
 
-    public String getEntityPackageName() {
-        return entityPackageName == null ? "" : entityPackageName + ".";
+    public String getProjectName() {
+        if (StringUtils.isBlank(projectName)) {
+            String[] projectNames = StringUtils.split(getPackageName(), "//.");
+            projectName = projectNames[projectNames.length - 1];
+            projectName = StringUtils.toCapitalizeCamelCase(projectName);
+        }
+        return projectName;
     }
 
-    public void setEntityPackageName(String entityPackageName) {
-        this.entityPackageName = entityPackageName;
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     public Path getPath() {
-        return path;
+        return path == null ? new Path() : path;
     }
 
     public void setPath(Path path) {
@@ -97,31 +104,19 @@ public class Configuration implements Serializable {
         private String service;
         private String entity;
         private String mapper;
-        private String future;//新增属性--组合式异步线程
-        private String composite;//新增属性--组合模式构件
-        private String sqlbuilder;//新增属性--sql语句构造器
-        private String hystrix;//新增属性--熔断器
-        private String basetest;//新增属性--单元测试基类
-        private String unittest;//新增属性--单元测试
 
         public Path() {
         }
 
-        public Path(String controller, String service, String entity, String mapper, String future, String composite, String sqlbuilder, String hystrix, String basetest, String unittest) {
+        public Path(String controller, String service, String entity, String mapper) {
             this.controller = controller;
             this.service = service;
             this.entity = entity;
             this.mapper = mapper;
-            this.future = future;
-            this.composite = composite;
-            this.sqlbuilder = sqlbuilder;
-            this.hystrix = hystrix;
-            this.basetest = basetest;
-            this.unittest = unittest;
         }
 
         public String getController() {
-            return controller == null ? "" : controller;
+            return StringUtils.isBlank(controller) ? "controller" : controller;
         }
 
         public void setController(String controller) {
@@ -129,7 +124,7 @@ public class Configuration implements Serializable {
         }
 
         public String getService() {
-            return service == null ? "" : service;
+            return StringUtils.isBlank(service) ? "service" : service;
         }
 
         public void setService(String service) {
@@ -137,7 +132,7 @@ public class Configuration implements Serializable {
         }
 
         public String getEntity() {
-            return entity == null ? "" : entity;
+            return StringUtils.isBlank(entity) ? "entity" : entity;
         }
 
         public void setEntity(String entity) {
@@ -145,60 +140,13 @@ public class Configuration implements Serializable {
         }
 
         public String getMapper() {
-            return mapper == null ? "" : mapper;
+            return StringUtils.isBlank(mapper) ? "mapper" : mapper;
         }
 
         public void setMapper(String mapper) {
             this.mapper = mapper;
         }
 
-        public String getFuture() {
-            return future;
-        }
-
-        public void setFuture(String future) {
-            this.future = future;
-        }
-
-        public String getComposite() {
-            return composite;
-        }
-
-        public void setComposite(String composite) {
-            this.composite = composite;
-        }
-
-        public String getSqlbuilder() {
-            return sqlbuilder == null ? "" : sqlbuilder;
-        }
-
-        public void setSqlbuilder(String sqlbuilder) {
-            this.sqlbuilder = sqlbuilder;
-        }
-
-        public String getHystrix() {
-            return hystrix;
-        }
-
-        public void setHystrix(String hystrix) {
-            this.hystrix = hystrix;
-        }
-
-        public String getBasetest() {
-            return basetest == null ? "" : basetest;
-        }
-
-        public void setBasetest(String basetest) {
-            this.basetest = basetest;
-        }
-
-        public String getUnittest() {
-            return unittest == null ? "" : unittest;
-        }
-
-        public void setUnittest(String unittest) {
-            this.unittest = unittest;
-        }
     }
 
 }

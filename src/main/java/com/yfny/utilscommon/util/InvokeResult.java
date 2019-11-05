@@ -37,6 +37,9 @@ public class InvokeResult<T> {
     //响应数据
     private T data;
 
+    //配置读取器
+    private static PropertiesLoader loader = new PropertiesLoader("props/business_code.properties", "props/system_code.properties");
+
     public static <T> InvokeResult success(T data) {
         return success("", data, null);
     }
@@ -46,7 +49,7 @@ public class InvokeResult<T> {
     }
 
     public static InvokeResult failure() {
-        return failure("10002", new String[]{"未知"});
+        return failure("sys.request.failed", new String[]{"未知"});
     }
 
     public static InvokeResult failure(String code, String... params) {
@@ -61,7 +64,7 @@ public class InvokeResult<T> {
     }
 
     public static InvokeResult exception() {
-        return exception("10003", new String[]{"未知"});
+        return exception("sys.request.exception", new String[]{"未知"});
     }
 
     public static InvokeResult exception(String code, String... params) {
@@ -69,6 +72,10 @@ public class InvokeResult<T> {
             params = new String[]{"未知"};
         }
         return getResultInit(code, "", null, EXCEPTION, params);
+    }
+
+    public static InvokeResult fallback(String applicationName) {
+        return exception("sys.request.fallback", applicationName, "网络请求超时或服务器崩溃");
     }
 
     /**
@@ -84,7 +91,7 @@ public class InvokeResult<T> {
         if (result == 1) {
             return InvokeResult.success(successCode, result);
         } else if (result == -1) {
-            return InvokeResult.failure("10002", "网络请求超时或服务器崩溃");
+            return InvokeResult.failure("sys.request.failed", "网络请求超时或服务器崩溃");
         }
         return InvokeResult.failure(failureCode, params);
     }
@@ -102,7 +109,7 @@ public class InvokeResult<T> {
         if (result != null) {
             return InvokeResult.success(successCode, result);
         } else if (result == null) {
-            return InvokeResult.failure("10002", "数据不存在或网络请求超时或服务器崩溃");
+            return InvokeResult.failure("sys.request.failed", "数据不存在或网络请求超时或服务器崩溃");
         }
         return InvokeResult.failure(failureCode, params);
     }
@@ -118,11 +125,11 @@ public class InvokeResult<T> {
      */
     private static InvokeResult getResultInit(String code, String message, Object data, int type, String[] params) {
         InvokeResult result = new InvokeResult();
-        code = StringUtils.isNotBlank(code) ? code : "10001";
+        code = StringUtils.isNotBlank(code) ? code : "sys.request.success";
         message = StringUtils.isNotBlank(message) ? message : getMsgFromCfg(code, params);
         data = data != null ? data : StringUtils.isUTF8(message);
         if (type == SUCCESS) {
-            code = "10001";
+            code = "sys.request.success";
         }
         result.setCode(code);
         result.setMessage(message);
@@ -138,7 +145,32 @@ public class InvokeResult<T> {
      * @return
      */
     public static String getMsgFromCfg(String code, String[] params) {
-        String message = invokeResult.applicationContext.getEnvironment().getProperty(code);
+        String message = "";
+        if (invokeResult != null && invokeResult.applicationContext != null
+                && invokeResult.applicationContext.getEnvironment() != null) {
+            message = invokeResult.applicationContext.getEnvironment().getProperty(code);
+            if (StringUtils.isBlank(message)) {
+                message = loader.getProperty(code, "");
+                if (StringUtils.isBlank(message)) {
+                    String[] codes = StringUtils.split(code, "//.", 2);
+                    code = "business." + codes[1];
+                    message = invokeResult.applicationContext.getEnvironment().getProperty(code);
+                    if (StringUtils.isBlank(message)) {
+                        message = "提示信息缺失";
+                    }
+                }
+            }
+        } else {
+            message = loader.getProperty(code, "");
+            if (StringUtils.isBlank(message)) {
+                String[] codes = StringUtils.split(code, "//.", 2);
+                code = "business." + codes[1];
+                message = loader.getProperty(code, "");
+                if (StringUtils.isBlank(message)) {
+                    message = "提示信息缺失";
+                }
+            }
+        }
         return params == null ? message : MessageFormat.format(message,
                 params);
     }
@@ -166,4 +198,5 @@ public class InvokeResult<T> {
     public void setData(T data) {
         this.data = data;
     }
+
 }

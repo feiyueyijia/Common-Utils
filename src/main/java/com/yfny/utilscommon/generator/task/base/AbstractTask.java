@@ -1,105 +1,48 @@
 package com.yfny.utilscommon.generator.task.base;
 
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.entity.ColumnInfo;
+import com.yfny.utilscommon.generator.entity.Configuration;
 import com.yfny.utilscommon.generator.utils.ConfigUtil;
 import com.yfny.utilscommon.generator.utils.StringUtil;
+import com.yfny.utilscommon.util.StringUtils;
 import freemarker.template.TemplateException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 代码生成器抽象任务
  * Created by jisongZhou on 2019/3/5.
  **/
 public abstract class AbstractTask implements Serializable {
-    protected String tableName;//数据库表名称
-    protected String className;//Java对象类名称
-    protected String description;//新增属性--描述
-    protected String applicationName;//新增属性--微服务名称
-    protected String foreignKey;//外键字段名
-    protected Map<String, String> relationClassNameMap;//相关对象类集合
+    protected int type;//新增属性--服务类型（生产者或者消费者）
+    protected BCodeMaterials materials = new BCodeMaterials();//数据库表结构信息
     protected List<ColumnInfo> tableInfos;//数据库表字段属性
+    protected List<BCodeMaterials> materialList = new ArrayList<>();//数据库表结构信息
 
-    /**
-     * Controller、Service、Dao
-     *
-     * @param className
-     */
-    public AbstractTask(String className) {
-        this.className = className;
+    public AbstractTask() {
+
     }
 
-    /**
-     * Controller、Service、Dao
-     *
-     * @param className
-     * @param description
-     */
-    public AbstractTask(String className, String description) {
-        this.className = className;
-        this.description = description;
+    public AbstractTask(int type) {
+        this.type = type;
     }
 
-    /**
-     * Controller、Service、Dao
-     *
-     * @param className
-     * @param description
-     * @param applicationName
-     */
-    public AbstractTask(String className, String description, String applicationName) {
-        this.className = className;
-        this.description = description;
-        this.applicationName = applicationName;
+    public AbstractTask(BCodeMaterials materials) {
+        this.materials = materials;
     }
 
-    /**
-     * SqlBuilder
-     *
-     * @param className
-     * @param tableName
-     * @param description
-     * @param tableInfos
-     */
-    public AbstractTask(String className, String tableName, String description, List<ColumnInfo> tableInfos) {
-        this.className = className;
-        this.tableName = tableName;
-        this.description = description;
+    public AbstractTask(List<BCodeMaterials> materialList) {
+        this.materialList = materialList;
+    }
+
+    public AbstractTask(BCodeMaterials materials, List<ColumnInfo> tableInfos) {
+        this.materials = materials;
         this.tableInfos = tableInfos;
-    }
-
-    /**
-     * Entity
-     *
-     * @param className
-     * @param tableName
-     * @param description
-     * @param tableInfos
-     * @param foreignKey
-     */
-    public AbstractTask(String className, String tableName, String description, List<ColumnInfo> tableInfos, String foreignKey) {
-        this.className = className;
-        this.tableName = tableName;
-        this.description = description;
-        this.tableInfos = tableInfos;
-        this.foreignKey = foreignKey;
-    }
-
-    /**
-     * Add
-     *
-     * @param className
-     * @param foreignKey
-     * @param relationClassNameMap
-     */
-    public AbstractTask(String className, String foreignKey, Map<String, String> relationClassNameMap) {
-        this.className = className;
-        this.foreignKey = foreignKey;
-        this.relationClassNameMap = relationClassNameMap;
     }
 
     public abstract void run() throws IOException, TemplateException;
@@ -113,6 +56,49 @@ public abstract class AbstractTask implements Serializable {
         if (!file.exists()) { // 检测文件路径是否存在，不存在则创建
             file.mkdir();
         }
+    }
+
+    protected Map<String, Object> constructData() {
+        Map<String, Object> dataMap = new HashMap<>();
+
+        Configuration configuration = ConfigUtil.getConfiguration();
+        String author = configuration.getAuthor();
+        String basePackageName = configuration.getPackageName();
+        String entityPackageName = configuration.getPath().getEntity();
+        String mapperPackageName = configuration.getPath().getMapper();
+        String servicePackageName = configuration.getPath().getService();
+        String controllerPackageName = configuration.getPath().getController();
+        String projectName = configuration.getProjectName();
+        String[] packageNames = StringUtils.split(basePackageName, "//.");
+        String applicationName = packageNames[packageNames.length - 1];
+
+        dataMap.put("BasePackageName", basePackageName);
+        dataMap.put("EntityPackageName", entityPackageName);
+        dataMap.put("ConstantPackageName", "constant");
+        dataMap.put("SqlBuilderPackageName", "builder");
+        dataMap.put("MapperPackageName", mapperPackageName);
+        dataMap.put("ServicePackageName", servicePackageName);
+        dataMap.put("AspectPackageName", "aspect");
+        dataMap.put("CompositePackageName", "composite");
+        dataMap.put("ValidPackageName", "valid");
+        dataMap.put("ControllerPackageName", controllerPackageName);
+        dataMap.put("APIUnitTestPackageName", "base");
+        dataMap.put("APIBaseTestPackageName", "unit");
+        dataMap.put("HystrixPackageName", "fallback");
+        dataMap.put("ClientPackageName", "client");
+        dataMap.put("Author", author);
+        dataMap.put("Date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+
+        dataMap.put("ColumnInfoList", tableInfos);
+        dataMap.put("ClassName", materials.getClassName());
+        dataMap.put("TableName", materials.getTableName());
+        dataMap.put("ApplicationName", applicationName);
+        dataMap.put("ProjectName", projectName);
+        dataMap.put("Descriptions", materials.getDescription());
+        dataMap.put("PrimaryKey", materials.getPrimaryKey());
+        dataMap.put("PkProperty", materials.getPkProperty());
+
+        return dataMap;
     }
 
 }

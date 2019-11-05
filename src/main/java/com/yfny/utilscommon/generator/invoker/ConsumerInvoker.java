@@ -1,5 +1,6 @@
 package com.yfny.utilscommon.generator.invoker;
 
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.invoker.base.AbstractBuilder;
 import com.yfny.utilscommon.generator.invoker.base.AbstractInvoker;
 import com.yfny.utilscommon.generator.invoker.base.Invoker;
@@ -13,8 +14,6 @@ import java.sql.SQLException;
  **/
 public class ConsumerInvoker extends AbstractInvoker {
 
-    protected String applicationName;
-
     @Override
     protected void getTableInfos() throws SQLException {
 
@@ -22,25 +21,15 @@ public class ConsumerInvoker extends AbstractInvoker {
 
     @Override
     protected void initTasks() {
-        taskQueue.initConsumerTasks(className, description, applicationName);
+        taskQueue.initConsumerTasks(materials);
     }
 
     public static class Builder extends AbstractBuilder {
 
         private ConsumerInvoker invoker = new ConsumerInvoker();
 
-        public Builder setClassName(String className) {
-            invoker.setClassName(className);
-            return this;
-        }
-
-        public Builder setDescription(String description) {
-            invoker.setDescription(description);
-            return this;
-        }
-
-        public Builder setApplicationName(String applicationName) {
-            invoker.setApplicationName(applicationName);
+        public Builder setMaterials(BCodeMaterials materials) {
+            invoker.setMaterials(materials);
             return this;
         }
 
@@ -54,17 +43,10 @@ public class ConsumerInvoker extends AbstractInvoker {
 
         @Override
         public void checkBeforeBuild() throws Exception {
-            if (StringUtil.isBlank(invoker.getClassName())) {
+            if (StringUtil.isBlank(invoker.getMaterials().getClassName())) {
                 throw new Exception("ClassName can not be null, please set className.");
             }
         }
     }
 
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
 }

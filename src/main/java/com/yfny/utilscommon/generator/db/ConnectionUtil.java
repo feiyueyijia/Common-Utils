@@ -1,8 +1,13 @@
 package com.yfny.utilscommon.generator.db;
 
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.entity.ColumnInfo;
+import com.yfny.utilscommon.generator.entity.RelationMaterials;
+import com.yfny.utilscommon.generator.invoker.RelationInvoker;
 import com.yfny.utilscommon.generator.utils.ConfigUtil;
 import com.yfny.utilscommon.generator.utils.StringUtil;
+import com.yfny.utilscommon.util.CommonUtils;
+import com.yfny.utilscommon.util.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -69,6 +74,87 @@ public class ConnectionUtil {
         statement.close();
         resultSet.close();
         return columnInfos;
+    }
+
+    /**
+     * 获取当前数据库的所有表
+     *
+     * @return
+     */
+    public List<BCodeMaterials> getTablesData() throws SQLException {
+        List<BCodeMaterials> materials = new ArrayList<>();
+        String url = ConfigUtil.getConfiguration().getDb().getUrl();
+        int a = url.indexOf("jdbc:mysql://") + 13;
+        int b = url.indexOf("/", a);
+        int c = url.indexOf("?");
+        String databaseName = url.substring(b + 1, c);
+        this.initConnection();
+        statement = connection.createStatement();
+        String sql = "SELECT TABLE_NAME,TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" + databaseName + "';";
+        resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            String tableName = resultSet.getString("TABLE_NAME");
+            String description = resultSet.getString("TABLE_COMMENT");
+            String className = StringUtils.toCapitalizeCamelCase(tableName);
+            if (!"t_database_relation".equals(tableName)) {
+                ResultSet tempResultSet = connection.getMetaData().getPrimaryKeys(null, null, tableName);
+                String primaryKey = null;
+                if (tempResultSet.next()) {
+                    primaryKey = tempResultSet.getObject(4).toString();
+                }
+                BCodeMaterials material = new BCodeMaterials();
+                material.setTableName(tableName);
+                material.setDescription(description);
+                material.setClassName(className);
+                material.setPrimaryKey(primaryKey);
+                material.setPkProperty(StringUtil.columnName2PropertyName(primaryKey));
+                materials.add(material);
+            }
+        }
+        for (BCodeMaterials material : materials) {
+            setRelation(material);
+        }
+        statement.close();
+        resultSet.close();
+        this.close();
+        return materials;
+    }
+
+    private void setRelation(BCodeMaterials material) throws SQLException {
+        List<RelationMaterials> relationMaterials = new ArrayList<>();
+        List<String> fkList = new ArrayList<>();
+        statement = connection.createStatement();
+        String sql = "SELECT id, primary_table, foreign_table, primary_key, foreign_key, relation_type FROM t_database_relation;";
+        resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            String id = resultSet.getString("id");
+            String primaryTable = resultSet.getString("primary_table");
+            String foreignTable = resultSet.getString("foreign_table");
+            String primaryKey = resultSet.getString("primary_key");
+            String foreignKey = resultSet.getString("foreign_key");
+            String relationType = resultSet.getString("relation_type");
+            if (material.getTableName().equals(primaryTable)) {
+                RelationMaterials primaryMaterial = new RelationMaterials();
+                primaryMaterial.setId(id);
+                primaryMaterial.setPkTableName(primaryTable);
+                primaryMaterial.setPkClassName(material.getClassName());
+                primaryMaterial.setPrimaryKey(primaryKey);
+                primaryMaterial.setPkProperty(StringUtil.columnName2PropertyName(primaryKey));
+                primaryMaterial.setFkTableName(foreignTable);
+                primaryMaterial.setFkClassName(StringUtils.toCapitalizeCamelCase(foreignTable));
+                primaryMaterial.setForeignKey(foreignKey);
+                primaryMaterial.setFkProperty(StringUtil.columnName2PropertyName(foreignKey));
+                primaryMaterial.setRelation(relationType);
+                relationMaterials.add(primaryMaterial);
+            } else if (material.getTableName().equals(foreignTable)) {
+                if (relationType.equals(RelationInvoker.Builder.ONE_TO_MANY) || relationType.equals(RelationInvoker.Builder.ONE_TO_ONE)) {
+                    fkList.add(foreignKey);
+                }
+            }
+        }
+        fkList = CommonUtils.removeDuplicate(fkList);
+        material.setRelationList(relationMaterials);
+        material.setFkList(fkList);
     }
 
     public void close() {

@@ -9,7 +9,6 @@ import com.yfny.utilscommon.util.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Before;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -168,8 +167,8 @@ public class BeforeBaseServiceImpl {
     private Class getCompositeClass(String compositeName) {
         /** 获取当前类的路径 com.yfny.servicedemandform*/
         String parentPackage = getPackageName();
-        String compositePackage = parentPackage + "composite" + "." + compositeName;
-        Class compositeClass = ReflectUtils.getClazz(compositePackage);
+        String compositePackage = parentPackage + "." + "composite" + "." + compositeName;
+        Class compositeClass = getClazz(compositePackage);
         return compositeClass;
     }
 
@@ -182,7 +181,11 @@ public class BeforeBaseServiceImpl {
     }
 
     public String getPackageName() {
-        return "com.yfny.utilscommon.";
+        return "com.yfny.utilscommon";
+    }
+
+    public Class<?> getClazz(String className) {
+        return null;
     }
 
 }

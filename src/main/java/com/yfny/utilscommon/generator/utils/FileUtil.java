@@ -40,19 +40,25 @@ public class FileUtil {
         fos.close();
     }
 
-    public static void addToJavaMapper(int type, Object data, String filePath) throws IOException, TemplateException {
+    public static String constructAddContent(int type, Object data, String content) throws IOException, TemplateException {
         Template tpl = getTemplate(type); // 获取模板文件
-        File file = new File(filePath);
         // 填充数据
         StringWriter writer = new StringWriter();
         tpl.process(data, writer);
         String addContents = writer.toString();
+        if (!content.contains(addContents)) {
+            content = content + addContents;
+        }
+        return content;
+    }
+
+    public static void addToJavaEnd(String addContents, String filePath) throws IOException {
+        File file = new File(filePath);
         String fileContents = readFileContent(filePath, 0);
         long content_length = fileContents.length();
         long file_length = file.length();
-
         //System.out.println("readLenth: " + fileContents.length());
-        long position = fileContents.lastIndexOf("Condition\")") + (file_length - content_length);
+        long position = fileContents.lastIndexOf("}") + (file_length - content_length);
         //System.out.println("position: " + position);
         addContainsToFile(filePath, position, addContents);
     }
@@ -65,12 +71,14 @@ public class FileUtil {
         tpl.process(data, writer);
         String addContents = writer.toString();
         String fileContents = readFileContent(filePath, 0);
-        long content_length = fileContents.length();
-        long file_length = file.length();
-        //System.out.println("readLenth: " + fileContents.length());
-        long position = fileContents.lastIndexOf("}") + (file_length - content_length);
-        //System.out.println("position: " + position);
-        addContainsToFile(filePath, position, addContents);
+        if (!fileContents.contains(addContents)) {
+            long content_length = fileContents.length();
+            long file_length = file.length();
+            //System.out.println("readLenth: " + fileContents.length());
+            long position = fileContents.lastIndexOf("}") + (file_length - content_length);
+            //System.out.println("position: " + position);
+            addContainsToFile(filePath, position, addContents);
+        }
     }
 
     /**
@@ -177,57 +185,111 @@ public class FileUtil {
      */
     private static Template getTemplate(int type) throws IOException {
         switch (type) {
-            case FreemarketConfigUtils.TYPE_ENTITY:
-                return FreemarketConfigUtils.getInstance().getTemplate("Entity.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_SQL_BUILDER:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerSqlBuilder.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_MAPPER:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerMapper.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_SERVICE:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerServiceImpl.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_COMPOSITE:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerComposite.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_BEFORE_SERVICE:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerBeforeServiceImpl.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_FUTURE:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerFuture.ftl");
-            case FreemarketConfigUtils.TYPE_PRODUCER_CONTROLLER:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerController.ftl");
-            case FreemarketConfigUtils.TYPE_CONSUMER_CLIENT:
-                return FreemarketConfigUtils.getInstance().getTemplate("ConsumerClient.ftl");
-            case FreemarketConfigUtils.TYPE_CONSUMER_HYSTRIX:
-                return FreemarketConfigUtils.getInstance().getTemplate("ConsumerHystrix.ftl");
-            case FreemarketConfigUtils.TYPE_CONSUMER_FUTURE:
-                return FreemarketConfigUtils.getInstance().getTemplate("ConsumerFuture.ftl");
-            case FreemarketConfigUtils.TYPE_CONSUMER_CONTROLLER:
-                return FreemarketConfigUtils.getInstance().getTemplate("ConsumerController.ftl");
-            case FreemarketConfigUtils.TYPE_EXCEPTION_HANDLER:
-                return FreemarketConfigUtils.getInstance().getTemplate("ExceptionHandler.ftl");
-            case FreemarketConfigUtils.TYPE_ADD_ENTITY:
-                return FreemarketConfigUtils.getInstance().getTemplate("EntityAdd.ftl");
-            case FreemarketConfigUtils.TYPE_ADD_PRODUCER_MAPPER:
-                return FreemarketConfigUtils.getInstance().getTemplate("ProducerMapperAdd.ftl");
-            case FreemarketConfigUtils.TYPE_API_BASE_TEST:
-                return FreemarketConfigUtils.getInstance().getTemplate("APIBaseTest.ftl");
-            case FreemarketConfigUtils.TYPE_API_UNIT_TEST:
-                return FreemarketConfigUtils.getInstance().getTemplate("APIUnitTest.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_ENTITY:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Entity.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_CONSTANT:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Constant.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_SQL_BUILDER:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("SqlBuilder.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_MAPPER:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Mapper.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_SERVICE:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Service.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_SERVICE_IMPL:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("ServiceImpl.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_COMPOSITE:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Composite.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_BEFORE_SERVICE:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("BeforeServiceImpl.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_VALID:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Valid.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_CONTROLLER:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Controller.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_CLIENT:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Client.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_HYSTRIX:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("Hystrix.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_EXCEPTION_HANDLER:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("ExceptionHandler.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_ADD_ENTITY:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("EntityAdd.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_ADD_MAPPER:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("MapperAdd.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_API_BASE_TEST:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("APIBaseTest.ftl");
+            case SchemeFreemarkerConfigUtils.TYPE_API_UNIT_TEST:
+                return SchemeFreemarkerConfigUtils.getInstance().getTemplate("APIUnitTest.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_MAIN_APPLICATION:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("MainApplication.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_MAIN_YAML:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("MainYaml.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_MAIN_BOOTSTRAP:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("MainBootstrap.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_TEST_APPLICATION:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("TestApplication.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_TEST_YAML:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("TestYaml.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_GIT_IGNORE:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("GitIgnore.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_PRODUCER_POM:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("ProducerPom.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_CONSUMER_POM:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("ConsumerPom.ftl");
+            case FrameFreemarkerConfigUtils.TYPE_README:
+                return FrameFreemarkerConfigUtils.getInstance().getTemplate("ReadMe.ftl");
             default:
                 return null;
         }
     }
 
-    private static String getBasicProjectPath() {
-        String path = new File(FileUtil.class.getClassLoader().getResource("").getFile()).getPath() + File.separator;
-        StringBuilder sb = new StringBuilder();
-        sb.append(path.substring(0, path.indexOf("target"))).append("src").append(File.separator).append("main").append(File.separator);
-        return sb.toString();
+    public final static int PRODUCER = 0;//服务生产者
+    public final static int CONSUMER = 1;//服务消费者API
+
+    private static String getBasicPath() {
+        return "/WorkSpace/Auto/";
     }
 
-    private static String getTestProjectPath() {
-        String path = new File(FileUtil.class.getClassLoader().getResource("").getFile()).getPath() + File.separator;
-        StringBuilder sb = new StringBuilder();
-        sb.append(path.substring(0, path.indexOf("target"))).append("src").append(File.separator).append("test").append(File.separator);
-        return sb.toString();
+    private static String getProducerPath(String projectName) {
+        String path = getBasicPath() + "Service-" + projectName + "/";
+        return path;
+    }
+
+    private static String getConsumerPath(String projectName) {
+        String path = getBasicPath() + "Service-" + projectName + "-api/";
+        return path;
+    }
+
+    public static String getPath(String projectName, int type) {
+        String path = "";
+        switch (type) {
+            case PRODUCER:
+                path = getProducerPath(projectName);
+                break;
+            case CONSUMER:
+                path = getConsumerPath(projectName);
+                break;
+            default:
+                break;
+        }
+        return path;
+    }
+
+    private static String getBasicProjectPath(String projectName, int type) {
+//        String path = new File(FileUtil.class.getClassLoader().getResource("").getFile()).getPath() + File.separator;
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(path.substring(0, path.indexOf("target"))).append("src").append(File.separator).append("main").append(File.separator);
+//        return sb.toString();
+        String path = getPath(projectName, type) + "src/main/";
+        return path;
+    }
+
+    private static String getTestProjectPath(String projectName, int type) {
+//        String path = new File(FileUtil.class.getClassLoader().getResource("").getFile()).getPath() + File.separator;
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(path.substring(0, path.indexOf("target"))).append("src").append(File.separator).append("test").append(File.separator);
+//        return sb.toString();
+        String path = getPath(projectName, type) + "src/test/";
+        return path;
     }
 
     /**
@@ -235,10 +297,12 @@ public class FileUtil {
      *
      * @return
      */
-    public static String getSourcePath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getBasicProjectPath()).append("java").append(File.separator);
-        return sb.toString();
+    public static String getSourcePath(String projectName, int type) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(getBasicProjectPath()).append("java").append(File.separator);
+//        return sb.toString();
+        String path = getBasicProjectPath(projectName, type) + "java/";
+        return path;
     }
 
     /**
@@ -246,10 +310,12 @@ public class FileUtil {
      *
      * @return
      */
-    public static String getResourcePath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getBasicProjectPath()).append("resources").append(File.separator);
-        return sb.toString();
+    public static String getResourcePath(String projectName, int type) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(getBasicProjectPath()).append("resources").append(File.separator);
+//        return sb.toString();
+        String path = getBasicProjectPath(projectName, type) + "resources/";
+        return path;
     }
 
     /**
@@ -257,10 +323,25 @@ public class FileUtil {
      *
      * @return
      */
-    public static String getTestPath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getTestProjectPath()).append("java").append(File.separator);
-        return sb.toString();
+    public static String getTestPath(String projectName, int type) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(getTestProjectPath()).append("java").append(File.separator);
+//        return sb.toString();
+        String path = getTestProjectPath(projectName, type) + "java/";
+        return path;
+    }
+
+    /**
+     * 获取单元测试资源文件路径
+     *
+     * @return
+     */
+    public static String getTestResourcePath(String projectName, int type) {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(getTestProjectPath()).append("java").append(File.separator);
+//        return sb.toString();
+        String path = getTestProjectPath(projectName, type) + "resources/";
+        return path;
     }
 
 }

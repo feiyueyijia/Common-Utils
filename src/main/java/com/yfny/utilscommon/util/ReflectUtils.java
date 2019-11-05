@@ -3,6 +3,7 @@ package com.yfny.utilscommon.util;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
+import javax.persistence.Column;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -226,6 +227,28 @@ public class ReflectUtils {
             }
         }
         return annotationFieldNameList;
+    }
+
+    /**
+     * 获取指定类中字段的数据库对应值
+     *
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
+    public static String getColumnName(Class<?> clazz, String fieldName) {
+        try {
+            String columnName = "";
+            Field field = clazz.getDeclaredField(fieldName);
+            if (field.isAnnotationPresent(Column.class)) {
+                Column annotation = field.getAnnotation(Column.class);
+                columnName = annotation.name();
+            }
+            return columnName;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

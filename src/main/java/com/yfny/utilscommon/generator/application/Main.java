@@ -1,7 +1,12 @@
 package com.yfny.utilscommon.generator.application;
 
+import com.yfny.utilscommon.generator.db.ConnectionUtil;
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.invoker.*;
 import com.yfny.utilscommon.generator.invoker.base.Invoker;
+import com.yfny.utilscommon.generator.utils.FileUtil;
+
+import java.util.List;
 
 /**
  * 代码生成器测试主类
@@ -9,44 +14,59 @@ import com.yfny.utilscommon.generator.invoker.base.Invoker;
  **/
 public class Main {
 
-    public static void main(String[] args) {
-        singleInvokerTest();
+    public static void main(String[] args) throws Exception {
+        ConnectionUtil connectionUtil = new ConnectionUtil();
+        List<BCodeMaterials> materials = connectionUtil.getTablesData();
+        producerFrameInvokerTest();
+        consumerFrameInvokerTest();
+        for (BCodeMaterials material : materials) {
+            singleInvokerTest(material);
+            producerInvokerTest(material);
+            consumerInvokerTest(material);
+            //apiTestInvokerTest();
+        }
+        Thread.sleep(5000);
+        relationInvoker(materials);
     }
 
-    public static void singleInvokerTest() {
+    public static void producerFrameInvokerTest() {
+        Invoker invoker = new FrameInvoker.Builder()
+                .setType(FileUtil.PRODUCER)
+                .build();
+        invoker.execute();
+    }
+
+    public static void consumerFrameInvokerTest() {
+        Invoker invoker = new FrameInvoker.Builder()
+                .setType(FileUtil.CONSUMER)
+                .build();
+        invoker.execute();
+    }
+
+    public static void singleInvokerTest(BCodeMaterials material) {
         Invoker invoker = new SingleInvoker.Builder()
-                .setTableName("user")
-                .setClassName("User")
-                .setDescription("用户")
+                .setMaterials(material)
                 .build();
         invoker.execute();
     }
 
-    public static void producerInvokerTest() {
+    public static void producerInvokerTest(BCodeMaterials material) {
         Invoker invoker = new ProducerInvoker.Builder()
-                .setTableName("user")
-                .setClassName("User")
-                .setDescription("用户")
-                .setFirst(true)
+                .setMaterials(material)
                 .build();
         invoker.execute();
     }
 
-    public void consumerInvokerTest() {
+    public static void consumerInvokerTest(BCodeMaterials material) {
         Invoker invoker = new ConsumerInvoker.Builder()
-                .setClassName("User")
-                .setDescription("用户")
-                .setApplicationName("service-user")
+                .setMaterials(material)
                 .build();
         invoker.execute();
     }
 
-    public void relationInvoker() {
+    public static void relationInvoker(List<BCodeMaterials> materials) {
         Invoker invoker = new RelationInvoker.Builder()
-                .setClassName("User")
-                .setForeignKey("userId")
-                .setRelationClass("Car", RelationInvoker.Builder.ONE_TO_MANY)
-                .setWriteType(RelationInvoker.Builder.ENTITY_FILE)
+                .setMaterialList(materials)
                 .build();
         invoker.execute();
     }

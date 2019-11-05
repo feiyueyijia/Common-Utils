@@ -1,9 +1,11 @@
 package com.yfny.utilscommon.generator.invoker.base;
 
 import com.yfny.utilscommon.generator.db.ConnectionUtil;
+import com.yfny.utilscommon.generator.entity.BCodeMaterials;
 import com.yfny.utilscommon.generator.entity.ColumnInfo;
 import com.yfny.utilscommon.generator.task.base.AbstractTask;
 import com.yfny.utilscommon.generator.utils.ConfigUtil;
+import com.yfny.utilscommon.generator.utils.FileUtil;
 import com.yfny.utilscommon.generator.utils.StringUtil;
 import com.yfny.utilscommon.generator.utils.TaskQueue;
 import freemarker.template.TemplateException;
@@ -11,7 +13,6 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,12 +21,8 @@ import java.util.concurrent.Executors;
  * Created by jisongZhou on 2019/3/5.
  **/
 public abstract class AbstractInvoker implements Invoker {
-    protected String tableName;
-    protected String className;
-    protected String description;//新增属性--描述
-    protected String foreignKey = "";//外键
-    protected boolean first = false;
-    protected Map<String, String> relationClassNameMap;
+    protected int type = FileUtil.PRODUCER;//新增属性--服务类型,默认值为生产者
+    protected BCodeMaterials materials = new BCodeMaterials();
     protected List<ColumnInfo> tableInfos;
     protected ConnectionUtil connectionUtil = new ConnectionUtil();
     protected TaskQueue taskQueue = new TaskQueue();
@@ -68,51 +65,19 @@ public abstract class AbstractInvoker implements Invoker {
         }
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public int getType() {
+        return type;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public BCodeMaterials getMaterials() {
+        return materials;
     }
 
-    public void setForeignKey(String foreignKey) {
-        this.foreignKey = foreignKey;
-    }
-
-    public void setFirst(boolean first) {
-        this.first = first;
-    }
-
-    public void setRelationClassNameMap(Map<String, String> relationClassNameMap) {
-        this.relationClassNameMap = relationClassNameMap;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getForeignKey() {
-        return foreignKey;
-    }
-
-    public boolean isFirst() {
-        return first;
-    }
-
-    public Map<String, String> getRelationClassNameMap() {
-        return relationClassNameMap;
+    public void setMaterials(BCodeMaterials materials) {
+        this.materials = materials;
     }
 }
