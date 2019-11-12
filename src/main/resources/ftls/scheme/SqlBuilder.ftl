@@ -49,7 +49,7 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
             if (StringUtils.isNotBlank(groupBy)) {
                 sqlResult = new SQL() {{
                 SELECT(
-                        groupBy
+                        groupBy + "AS" + fieldName
                 );
                 FROM("${TableName}");
                 GROUP_BY(groupBy);
@@ -67,6 +67,7 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
         <#assign ColumnInfoListIndex = 0/>
         <#list ColumnInfoList as ColumnInfo>
             <#assign ColumnInfoListIndex = ColumnInfoListIndex + 1/>
+                    "${ColumnInfo.columnName}," +
                     "${ColumnInfo.columnName} AS ${ColumnInfo.propertyName}<#if ColumnInfoListSize!=ColumnInfoListIndex>," +<#else>"</#if>
         </#list>
                    );

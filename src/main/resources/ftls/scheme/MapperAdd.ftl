@@ -1,26 +1,3 @@
-<#if ClassType == "FOREIGN">
-    <#if RelationType == "ONE2ONE" || RelationType == "MANY2ONE">
-    /**
-     * 根据外键查询相应对象（一对一关系）
-     *
-     * @param   ${FkProperty}    外键
-     * @return  返回对象为查询结果
-     */
-    @Select("SELECT * FROM ${TableName} WHERE ${ForeignKey} = <#noparse>#{</#noparse>${FkProperty}<#noparse>}</#noparse>")
-    ${ClassName}Entity select${ClassName}By${FkProperty?cap_first}(String ${FkProperty});
-
-    <#elseif RelationType == "ONE2MANY">
-    /**
-     * 根据外键查询相应对象（一对多关系）
-     *
-     * @param   ${FkProperty}    外键
-     * @return  返回对象列表为查询结果
-     */
-    @Select("SELECT * FROM ${TableName} WHERE ${ForeignKey} = <#noparse>#{</#noparse>${FkProperty}<#noparse>}</#noparse>")
-    List<${ClassName}Entity> find${ClassName}By${FkProperty?cap_first}(String ${FkProperty});
-
-    </#if>
-<#elseif ClassType == "PRIMARY">
     @SelectProvider(type = ${ClassName}SqlBuilder.class, method = "buildFind${ClassName}ByAndCondition")
     @Results({
             @Result(id = true, column = "${PrimaryKey}", property = "${PkProperty}"),
@@ -83,4 +60,4 @@
         </#list>
     })
     ${ClassName}Entity selectComplexById(@Param("id") String id);
-</#if>
+

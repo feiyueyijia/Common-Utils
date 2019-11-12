@@ -30,6 +30,9 @@ public class BaseTree implements Serializable {
     @Transient
     private String level;//层级字段定义
 
+    @Transient
+    private String haveList;//是否返回列表
+
     public String getId() {
         return StringUtils.isNotBlank(id) ? id : "id";
     }
@@ -60,5 +63,13 @@ public class BaseTree implements Serializable {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public String getHaveList() {
+        return StringUtils.isNotBlank(haveList) ? haveList : "false";
+    }
+
+    public void setHaveList(String haveList) {
+        this.haveList = haveList;
     }
 }

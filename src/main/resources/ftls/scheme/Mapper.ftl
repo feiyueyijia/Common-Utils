@@ -49,6 +49,33 @@ public interface ${ClassName}Mapper extends BaseMapper<${ClassName}Entity> {
      * @return 返回对象为查询结果
      */
     @Select("SELECT * FROM ${TableName} WHERE ${PrimaryKey} = ${r'#{id}'}")
+    @Results({
+            @Result(id = true, column = "${PrimaryKey}", property = "${PkProperty}"),
+    <#list ColumnInfoList as ColumnInfo>
+        <#if !ColumnInfo.primaryKey>
+            @Result(column = "${ColumnInfo.columnName}", property = "${ColumnInfo.propertyName}"),
+        </#if>
+    </#list>
+    })
     ${ClassName}Entity selectById(@Param("id") String id);
+
+    <#list ForeignKeyList as Foreign>
+    /**
+     * 根据外键查询相应对象（一对多关系）
+     *
+     * @param   ${Foreign.fkProperty}    外键
+     * @return  返回对象列表为查询结果
+     */
+    @Select("SELECT * FROM ${TableName} WHERE ${Foreign.foreignKey} = <#noparse>#{</#noparse>${Foreign.fkProperty}<#noparse>}</#noparse>")
+    @Results({
+            @Result(id = true, column = "${PrimaryKey}", property = "${PkProperty}"),
+    <#list ColumnInfoList as ColumnInfo>
+        <#if !ColumnInfo.primaryKey>
+            @Result(column = "${ColumnInfo.columnName}", property = "${ColumnInfo.propertyName}"),
+        </#if>
+    </#list>
+    })
+    List<${ClassName}Entity> find${ClassName}By${Foreign.fkProperty?cap_first}(String ${Foreign.fkProperty});
+    </#list>
 
 }

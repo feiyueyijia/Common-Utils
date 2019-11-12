@@ -4,6 +4,7 @@ import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,6 +91,38 @@ public class RedisUtils {
                 redisTemplate.delete(key[0]);
             } else {
                 redisTemplate.delete(CollectionUtils.arrayToList(key));
+            }
+        }
+    }
+
+    /**
+     * 根据前缀删除
+     *
+     * @param prefix
+     */
+    public void deleteByPrefix(String prefix) {
+        Set<String> set = redisTemplate.keys(prefix + "*");
+        if (set.size() > 0) {
+            Iterator<String> it = set.iterator();
+            while (it.hasNext()) {
+                String keyStr = it.next();
+                redisTemplate.delete(keyStr);
+            }
+        }
+    }
+
+    /**
+     * 根据后缀删除
+     *
+     * @param suffix
+     */
+    public void deleteBySuffix(String suffix) {
+        Set<String> set = redisTemplate.keys("*" + suffix);
+        if (set.size() > 0) {
+            Iterator<String> it = set.iterator();
+            while (it.hasNext()) {
+                String keyStr = it.next();
+                redisTemplate.delete(keyStr);
             }
         }
     }

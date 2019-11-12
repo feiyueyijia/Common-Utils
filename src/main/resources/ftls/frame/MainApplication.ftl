@@ -11,7 +11,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableDiscoveryClient
 @EnableFeignClients
 @MapperScan("${BasePackageName}.mapper")
-@ComponentScan(basePackages = {"${BasePackageName}.**"})
+@ComponentScan(basePackages = {"${BasePackageName}.**","com.yfny.utilscommon"})
 public class ${ProjectName}Application {
 
     public static void main(String[] args) {

@@ -57,7 +57,7 @@ public class TaskQueue {
 
     public void initProducerTasks(BCodeMaterials materials, List<ColumnInfo> tableInfos) {
         taskQueue.add(new SqlBuilderTask(materials, tableInfos));
-        taskQueue.add(new MapperTask(materials));
+        taskQueue.add(new MapperTask(materials, tableInfos));
         taskQueue.add(new ServiceTask(materials));
         taskQueue.add(new ServiceImplTask(materials));
         taskQueue.add(new CompositeTask(materials));

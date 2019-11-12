@@ -28,10 +28,7 @@ public class RelationInvoker extends AbstractInvoker {
     private List<BCodeMaterials> materialList = new ArrayList<>();
 
     public static class Builder extends AbstractBuilder {
-
-        public final static String PRIMARY_CLASS = "PRIMARY";
-        public final static String FOREIGN_CLASS = "FOREIGN";
-
+        
         public final static String ONE_TO_ONE = "ONE2ONE";
         public final static String ONE_TO_MANY = "ONE2MANY";
         public final static String MANY_TO_ONE = "MANY2ONE";

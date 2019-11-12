@@ -1,5 +1,6 @@
 package com.yfny.utilscommon.annotation.redis;
 
+import com.yfny.utilscommon.basemvc.common.BaseEntity;
 import com.yfny.utilscommon.util.ReflectUtils;
 import com.yfny.utilscommon.util.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -74,19 +75,27 @@ public class CacheableAop implements Ordered {
 
     @Around("@annotation(evict)")
     public Object evictCache(ProceedingJoinPoint pjp, CacheEvict evict) throws Throwable {
-        Object value = null;
+        Object result = null;
         try {
             String keySuffix = getCacheKey(pjp, evict);
             String[] objectKeyPrefix = evict.objectKeyPrefix();
             String[] listKeyPrefix = evict.listKeyPrefix();
-            value = pjp.proceed(pjp.getArgs());
+            Object[] args = pjp.getArgs();
+            Object value = null;
+            if (args.length == 1) {
+                value = args[0];
+            }
+            result = pjp.proceed();
+            if (result != null && result instanceof BaseEntity) {
+                value = result;
+            }
             CacheEvict.KeyMode keyMode = evict.keyMode();
             resetCacheBasic(objectKeyPrefix, keySuffix, value, keyMode);
             updateCacheList(listKeyPrefix, keySuffix, value, keyMode);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return value;
+        return result;
     }
 
     /**
@@ -202,10 +211,12 @@ public class CacheableAop implements Ordered {
      * @param keyMode         类型
      */
     private void resetCacheBasic(String[] objectKeyPrefix, String keySuffix, Object value, CacheEvict.KeyMode keyMode) {
+        // 清除对应缓存
+        if (StringUtils.isNotBlank(keySuffix)) {
+            redisUtil.deleteBySuffix(keySuffix);
+        }
         for (String objectKey : objectKeyPrefix) {
             String key = objectKey + keySuffix;
-            // 清除对应缓存
-            redisUtil.del(key);
             if (value != null) {
                 if (keyMode == CacheEvict.KeyMode.BASIC_INSERT || keyMode == CacheEvict.KeyMode.BASIC_UPDATE) {
                     redisUtil.set(key, value, CommonCacheTime.HALF_HOUR);

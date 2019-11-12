@@ -3,6 +3,10 @@ package com.yfny.utilscommon.basemvc.producer;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yfny.utilscommon.annotation.redis.CacheEvict;
+import com.yfny.utilscommon.annotation.redis.CacheKey;
+import com.yfny.utilscommon.annotation.redis.Cacheable;
+import com.yfny.utilscommon.annotation.redis.CommonCacheTime;
 import com.yfny.utilscommon.basemvc.common.BaseEntity;
 import com.yfny.utilscommon.basemvc.common.BaseTree;
 import com.yfny.utilscommon.basemvc.common.BusinessException;
@@ -47,6 +51,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
+    @CacheEvict
     public int insert(T entity) throws BusinessException {
         save(getBaseComponent());
         return getBaseMapper().insert(entity);
@@ -60,6 +65,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
+    @CacheEvict
     public int insertSelective(T entity) throws BusinessException {
         saveSelective(getBaseComponent());
         return getBaseMapper().insertSelective(entity);
@@ -73,7 +79,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int update(T entity) throws BusinessException {
+    @CacheEvict(keyMode = CacheEvict.KeyMode.OBJECT_UPDATE_BASIC)
+    public int update(@CacheKey(field = "id") T entity) throws BusinessException {
         save(getBaseComponent());
         return getBaseMapper().updateByPrimaryKey(entity);
     }
@@ -86,7 +93,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int updateSelective(T entity) throws BusinessException {
+    @CacheEvict(keyMode = CacheEvict.KeyMode.OBJECT_UPDATE_BASIC)
+    public int updateSelective(@CacheKey(field = "id") T entity) throws BusinessException {
         saveSelective(getBaseComponent());
         return getBaseMapper().updateByPrimaryKeySelective(entity);
     }
@@ -151,7 +159,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
-    public int delete(T entity) throws BusinessException {
+    @CacheEvict(keyMode = CacheEvict.KeyMode.OBJECT_DELETE)
+    public int delete(@CacheKey(field = "id") T entity) throws BusinessException {
         if (getBaseComponent().list != null && getBaseComponent().list.size() > 0) {
             for (Object composite : getBaseComponent().list) {
                 ((AbstractComponent) composite).delete();
@@ -168,6 +177,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      */
     @LcnTransaction //分布式事务注解
     @Transactional  //本地事务注解
+    @CacheEvict(keyMode = CacheEvict.KeyMode.BASIC_DELETE)
     public int deleteByPrimaryKey(Object key) throws BusinessException {
         return getBaseMapper().deleteByPrimaryKey(key);
     }
@@ -210,7 +220,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      * @param key 主键
      * @return 返回null为未查询到结果，返回对象为查询结果
      */
-    public T selectByPrimaryKey(Object key) throws BusinessException {
+    @Cacheable(expire = CommonCacheTime.ONE_WEEK)
+    public T selectByPrimaryKey(@CacheKey Object key) throws BusinessException {
         return getBaseMapper().selectByPrimaryKey(key);
     }
 
@@ -220,7 +231,8 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      * @param id 主键
      * @return 返回null为未查询到结果，返回对象为查询结果
      */
-    public T selectComplexById(String id) throws BusinessException {
+    @Cacheable(expire = CommonCacheTime.ONE_WEEK)
+    public T selectComplexById(@CacheKey String id) throws BusinessException {
         try {
             return getBaseMapper().selectComplexById(id);
         } catch (Exception e) {
@@ -341,9 +353,13 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
                 map.put("level", level);
                 mapList.add(map);
             }
-            String treeList = MultipleTreeUtils.getTreeList(mapList);
-            resultMap.put("tree", treeList);
-            resultMap.put("list", list);
+            String treeStr = MultipleTreeUtils.getTreeList(mapList);
+            List<T> treeList = new ArrayList<>();
+            if ("true".equals(entity.getTreeConfig().getHaveList())) {
+                treeList = list;
+            }
+            resultMap.put("tree", treeStr);
+            resultMap.put("list", treeList);
         } catch (NullPointerException e) {
             throw new BusinessException("sys.custom.error", "未检测到树形结构依据，请添加树形依据或者使用其他接口！");
         } catch (Exception e) {
