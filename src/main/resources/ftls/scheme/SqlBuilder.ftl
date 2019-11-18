@@ -81,7 +81,7 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
             if (${ClassName?uncap_first}.getNumScopes() != null && ${ClassName?uncap_first}.getNumScopes().size() > 0) {
                 for (BaseNumScope scope : ${ClassName?uncap_first}.getNumScopes()) {
                     if ("${ColumnInfo.propertyName}".equals(scope.getName())) {
-                        String conditions = numScope(function, scope);
+                        String conditions = numScope(${ClassName?uncap_first}, scope);
                         if (StringUtils.isNotBlank(conditions)) {
                             WHERE(conditions);
                         }
@@ -93,7 +93,7 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
             if (${ClassName?uncap_first}.getTimeScopes() != null && ${ClassName?uncap_first}.getTimeScopes().size() > 0) {
                 for (BaseTimeScope scope : ${ClassName?uncap_first}.getTimeScopes()) {
                     if ("${ColumnInfo.propertyName}".equals(scope.getName())) {
-                        String conditions = timeScope(function, scope);
+                        String conditions = timeScope(${ClassName?uncap_first}, scope);
                         if (StringUtils.isNotBlank(conditions)) {
                             WHERE(conditions);
                         }
@@ -103,7 +103,7 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
             </#if>
         </#list>
         }}.toString();
-        orderBy(${ClassName?uncap_first}, sqlResult);
+        sqlResult = orderBy(${ClassName?uncap_first}, sqlResult);
         return sqlResult;
     }
 

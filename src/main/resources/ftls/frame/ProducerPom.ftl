@@ -66,6 +66,11 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
             <version>${r'${nacos-spring.version}'}</version>
         </dependency>
+        <!-- 断路器依赖 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
         <!-- mysql数据库依赖开始 -->
         <dependency>
             <groupId>mysql</groupId>

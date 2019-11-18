@@ -65,6 +65,18 @@ feign:
     hystrix:
         enabled: true
 
+#ribbon请求连接的超时时间
+ribbon:
+    ConnectTimeout: 10000
+    #请求处理的超时时间
+    ReadTimeout: 10000
+    #对所有请求操作都进行重试
+    OkToRetryOnAllOperations: true
+    #对当前服务的重试次数（第一次分配给9082的时候，如果404，则再重试MaxAutoRetries次，如果还是404，则切换到其他服务MaxAutoRetriesNextServer决定）
+    MaxAutoRetries: 0
+    #切换服务的次数(比如本次请求分配给9082处理，发现404，则切换分配给9081处理，如果还是404，则返回404给客户端）
+    MaxAutoRetriesNextServer: 0
+
 #mybatis中pagehelper分页插件
 pagehelper:
     helperDialect: mysql

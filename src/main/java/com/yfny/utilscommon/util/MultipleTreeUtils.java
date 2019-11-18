@@ -1,6 +1,5 @@
 package com.yfny.utilscommon.util;
 
-import com.alibaba.fastjson.JSONObject;
 import com.yfny.utilscommon.basemvc.common.BaseTree;
 
 import java.util.*;
@@ -30,12 +29,16 @@ public class MultipleTreeUtils {
                 node.id = (String) dataRecord.get("id");
                 node.label = (String) dataRecord.get("name");
                 node.parentId = (String) dataRecord.get("parentId");
-                if (BaseTree.NODE_STRING.equals(type)) {
-                    node.level = (int) dataRecord.get("level");
-                } else if (BaseTree.NODE_NUMBER.equals(type)) {
-                    node.level = AsciiUtils.SumStrAscii(node.id);
+                Object level = dataRecord.get("level");
+                if (BaseTree.NODE_NUMBER.equals(type)) {
+                    if (level != null && StringUtils.isNumeric(level.toString())) {
+                        node.level = (int) dataRecord.get("level");
+                    } else {
+                        node.level = AsciiUtils.sumStrAscii(node.id);
+                    }
+                } else if (BaseTree.NODE_STRING.equals(type)) {
+                    node.level = AsciiUtils.sumStrAscii(node.id);
                 }
-
                 nodeList.put(node.id, node);
             }
             // 构造无序的多叉树

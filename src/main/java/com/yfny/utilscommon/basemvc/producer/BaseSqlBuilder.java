@@ -58,15 +58,18 @@ public class BaseSqlBuilder {
         return conditions;
     }
 
-    protected <T extends BaseEntity> void orderBy(T entity, String sqlResult) {
+    protected <T extends BaseEntity> String orderBy(T entity, String sqlResult) {
         if (entity.getOrders() != null && entity.getOrders().size() > 0) {
             List<BaseOrder> orders = entity.getOrders();
             int count = 0;
             sqlResult = sqlResult + " ORDER BY ";
             String orderBy = "";
             for (BaseOrder order : orders) {
+                String orderColumn = ReflectUtils.getColumnName(entity.getClass(), order.getOrderBy());
                 if (count != 0) {
-                    orderBy = ", " + order.getOrderBy();
+                    orderBy = ", " + orderColumn;
+                } else {
+                    orderBy = orderColumn;
                 }
                 if (BaseEntity.DESC.equals(order.getOrderSort())) {
                     sqlResult = sqlResult + orderBy + " DESC";
@@ -76,6 +79,7 @@ public class BaseSqlBuilder {
                 count++;
             }
         }
+        return sqlResult;
     }
 
 }
