@@ -53,6 +53,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @Transactional  //本地事务注解
     @CacheEvict
     public int insert(T entity) throws BusinessException {
+        entity.setAction(BaseEntity.INSERT);
         save(getBaseComponent());
         return getBaseMapper().insert(entity);
     }
@@ -67,6 +68,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @Transactional  //本地事务注解
     @CacheEvict
     public int insertSelective(T entity) throws BusinessException {
+        entity.setAction(BaseEntity.INSERT);
         saveSelective(getBaseComponent());
         return getBaseMapper().insertSelective(entity);
     }
@@ -81,6 +83,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @Transactional  //本地事务注解
     @CacheEvict(keyMode = CacheEvict.KeyMode.OBJECT_UPDATE_BASIC)
     public int update(@CacheKey(field = "id") T entity) throws BusinessException {
+        entity.setAction(BaseEntity.UPDATE);
         save(getBaseComponent());
         return getBaseMapper().updateByPrimaryKey(entity);
     }
@@ -95,6 +98,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @Transactional  //本地事务注解
     @CacheEvict(keyMode = CacheEvict.KeyMode.OBJECT_UPDATE_BASIC)
     public int updateSelective(@CacheKey(field = "id") T entity) throws BusinessException {
+        entity.setAction(BaseEntity.UPDATE);
         saveSelective(getBaseComponent());
         return getBaseMapper().updateByPrimaryKeySelective(entity);
     }
@@ -161,6 +165,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @Transactional  //本地事务注解
     @CacheEvict(keyMode = CacheEvict.KeyMode.OBJECT_DELETE)
     public int delete(@CacheKey(field = "id") T entity) throws BusinessException {
+        entity.setAction(BaseEntity.DELETE);
         if (getBaseComponent().list != null && getBaseComponent().list.size() > 0) {
             for (Object composite : getBaseComponent().list) {
                 ((AbstractComponent) composite).delete();

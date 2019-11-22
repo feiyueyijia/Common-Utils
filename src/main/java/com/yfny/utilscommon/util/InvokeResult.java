@@ -156,7 +156,10 @@ public class InvokeResult<T> {
                     code = "business." + codes[1];
                     message = invokeResult.applicationContext.getEnvironment().getProperty(code);
                     if (StringUtils.isBlank(message)) {
-                        message = "提示信息缺失";
+                        message = loader.getProperty(code, "");
+                        if (StringUtils.isBlank(message)) {
+                            message = "提示信息缺失";
+                        }
                     }
                 }
             }

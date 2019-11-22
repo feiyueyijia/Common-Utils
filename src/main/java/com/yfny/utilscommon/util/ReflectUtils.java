@@ -356,13 +356,13 @@ public class ReflectUtils {
                 isExistPkValue = true;
                 if (pkValue instanceof String) {
                     if (StringUtils.isBlank((String) pkValue)) {
-                        pkValue = StringUtils.uuid();
+                        pkValue = IdGen.randomLongStr();
                         ReflectUtils.setFieldValue(entity, pkName, pkValue);
                         isExistPkValue = false;
                     }
                 }
             } else {
-                pkValue = StringUtils.uuid();
+                pkValue = IdGen.randomLongStr();
                 ReflectUtils.setFieldValue(entity, pkName, pkValue);
             }
             return isExistPkValue;

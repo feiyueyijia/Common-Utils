@@ -5,6 +5,8 @@
 server:
     #端口号
     port: ${(IsLocal)?string("8080","'${r'${server.port}'}'")}
+    servlet:
+        context-path: /${ProjectArtifactId}
 spring:
     application:
         #服务名称，同一注册中心下不能重复

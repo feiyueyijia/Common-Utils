@@ -1,4 +1,4 @@
-package ${BasePackageName}.exception;
+package ${BasePackageName}.handler;
 
 import com.yfny.utilscommon.basemvc.common.BusinessException;
 import com.yfny.utilscommon.util.InvokeResult;
