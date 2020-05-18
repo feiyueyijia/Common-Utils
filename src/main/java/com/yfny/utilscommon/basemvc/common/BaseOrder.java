@@ -13,6 +13,9 @@ import java.io.Serializable;
  */
 public class BaseOrder implements Serializable {
 
+    public final static String ASC = "ASC";//升序
+    public final static String DESC = "DESC";//降序
+
     @Transient
     private String orderBy;
 

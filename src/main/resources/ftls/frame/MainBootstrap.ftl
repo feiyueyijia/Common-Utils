@@ -19,4 +19,4 @@ spring.application.name=${ProjectArtifactId}
 #spring.cloud.nacos.config.refreshable-dataids=example1.properties,example2.properties
 
 #指定配置的后缀，支持 properties、yaml、yml，默认为 properties
-spring.cloud.nacos.config.file-extension=yaml
+spring.cloud.nacos.config.file-extension=yml

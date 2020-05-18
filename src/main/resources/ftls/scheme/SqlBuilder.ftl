@@ -16,26 +16,6 @@ import org.apache.ibatis.jdbc.SQL;
 public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，多条件并列查询取交集
-     *
-     * @param   ${ClassName?uncap_first}    对象实体
-     * @return  Sql语句
-     */
-    public String buildFind${ClassName}ByAndCondition(final ${ClassName}Entity ${ClassName?uncap_first}) {
-        return buildFind${ClassName}ByCondition(${ClassName?uncap_first}, 0);
-    }
-
-    /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，多条件亦或查询取并集
-     *
-     * @param   ${ClassName?uncap_first}    对象实体
-     * @return  Sql语句
-     */
-    public String buildFind${ClassName}ByORCondition(final ${ClassName}Entity ${ClassName?uncap_first}) {
-        return buildFind${ClassName}ByCondition(${ClassName?uncap_first}, 1);
-    }
-
-    /**
      * 根据实体中的属性进行维度区分，查询分组
      *
      * @param   ${ClassName?uncap_first}    对象实体
@@ -49,33 +29,28 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
             if (StringUtils.isNotBlank(groupBy)) {
                 sqlResult = new SQL() {{
                 SELECT(
-                        groupBy + "AS" + fieldName
+                        groupBy + " AS " + fieldName
                 );
                 FROM("${TableName}");
                 GROUP_BY(groupBy);
                 }}.toString();
             }
         }
-        return StringUtils.isNotBlank(sqlResult) ? sqlResult : buildFind${ClassName}ByAndCondition(${ClassName?uncap_first});
+        return StringUtils.isNotBlank(sqlResult) ? sqlResult : buildFind${ClassName}ByCondition(${ClassName?uncap_first});
     }
 
-    private String buildFind${ClassName}ByCondition(final ${ClassName}Entity ${ClassName?uncap_first}, final int type) {
-        String finalOrSql = queryWay(type);
+    public String buildFind${ClassName}ByCondition(final ${ClassName}Entity ${ClassName?uncap_first}) {
+        String column = column();
         String sqlResult = new SQL() {{
             SELECT(
-        <#assign ColumnInfoListSize = ColumnInfoList?size/>
-        <#assign ColumnInfoListIndex = 0/>
-        <#list ColumnInfoList as ColumnInfo>
-            <#assign ColumnInfoListIndex = ColumnInfoListIndex + 1/>
-                    "${ColumnInfo.columnName}," +
-                    "${ColumnInfo.columnName} AS ${ColumnInfo.propertyName}<#if ColumnInfoListSize!=ColumnInfoListIndex>," +<#else>"</#if>
-        </#list>
-                   );
+                    column
+            );
             FROM("${TableName}");
         <#list ColumnInfoList as ColumnInfo>
             <#if ColumnInfo.typeName == "String">
             if (${ClassName?uncap_first}.get${ColumnInfo.propertyName?cap_first}() != null && !${ClassName?uncap_first}.get${ColumnInfo.propertyName?cap_first}().equals("")) {
-                WHERE("${ColumnInfo.columnName} like <#noparse>#{</#noparse>${ClassName?uncap_first}.${ColumnInfo.propertyName}<#noparse>}</#noparse>" + finalOrSql);
+                String conditions = queryBy(${ClassName?uncap_first}, "${ClassName?uncap_first}", "${ColumnInfo.columnName}", "${ColumnInfo.propertyName}");
+                WHERE(conditions);
             }
             <#elseif ColumnInfo.typeName == "long" || ColumnInfo.typeName == "int" || ColumnInfo.typeName == "short" || ColumnInfo.typeName == "double">
             if (${ClassName?uncap_first}.getNumScopes() != null && ${ClassName?uncap_first}.getNumScopes().size() > 0) {
@@ -105,6 +80,30 @@ public class ${ClassName}SqlBuilder extends BaseSqlBuilder {
         }}.toString();
         sqlResult = orderBy(${ClassName?uncap_first}, sqlResult);
         return sqlResult;
+    }
+
+    private String column() {
+        String column =
+        <#assign ColumnInfoListSize = ColumnInfoList?size/>
+        <#assign ColumnInfoListIndex = 0/>
+        <#list ColumnInfoList as ColumnInfo>
+            <#assign ColumnInfoListIndex = ColumnInfoListIndex + 1/>
+            "${ColumnInfo.columnName}," +
+            "${ColumnInfo.columnName} AS ${ColumnInfo.propertyName}<#if ColumnInfoListSize!=ColumnInfoListIndex>," +<#else>";</#if>
+        </#list>
+        return column;
+    }
+
+    private String columnJoin() {
+        String column =
+        <#assign ColumnInfoListSize = ColumnInfoList?size/>
+        <#assign ColumnInfoListIndex = 0/>
+        <#list ColumnInfoList as ColumnInfo>
+            <#assign ColumnInfoListIndex = ColumnInfoListIndex + 1/>
+            "main.${ColumnInfo.columnName}," +
+            "main.${ColumnInfo.columnName} AS ${ColumnInfo.propertyName}<#if ColumnInfoListSize!=ColumnInfoListIndex>," +<#else>";</#if>
+        </#list>
+        return column;
     }
 
 }

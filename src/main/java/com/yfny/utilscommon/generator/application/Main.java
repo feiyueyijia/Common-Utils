@@ -7,6 +7,7 @@ import com.yfny.utilscommon.generator.invoker.base.Invoker;
 import com.yfny.utilscommon.generator.utils.FileUtil;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * 代码生成器测试主类
@@ -15,18 +16,77 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        CountDownLatch countDownLatch = new CountDownLatch(3);
+
         ConnectionUtil connectionUtil = new ConnectionUtil();
         List<BCodeMaterials> materials = connectionUtil.getTablesData();
-        producerFrameInvokerTest();
-        consumerFrameInvokerTest();
-        for (BCodeMaterials material : materials) {
-            singleInvokerTest(material);
-            producerInvokerTest(material);
-            consumerInvokerTest(material);
-            //apiTestInvokerTest();
-        }
-        Thread.sleep(5000);
-        relationInvoker(materials);
+
+        Thread frameThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    producerFrameInvokerTest();
+                    consumerFrameInvokerTest();
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("CountDownLatch等待失败...", e);
+                }
+                countDownLatch.countDown();
+            }
+        }, "Frame-Thread");
+
+        Thread singleThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (BCodeMaterials material : materials) {
+                        singleInvokerTest(material);
+                    }
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("CountDownLatch等待失败...", e);
+                }
+                countDownLatch.countDown();
+            }
+        }, "Single-Thread");
+
+        Thread codeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (BCodeMaterials material : materials) {
+                        producerInvokerTest(material);
+                        consumerInvokerTest(material);
+                        //apiTestInvokerTest();
+                    }
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("CountDownLatch等待失败...", e);
+                }
+                countDownLatch.countDown();
+            }
+        }, "Code-Thread");
+
+        Thread relationThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    countDownLatch.await();
+                    relationInvoker(materials);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("CountDownLatch等待失败...", e);
+                }
+            }
+        }, "Relation-Thread");
+
+        frameThread.start();
+        singleThread.start();
+        codeThread.start();
+        relationThread.start();
     }
 
     public static void producerFrameInvokerTest() {

@@ -78,22 +78,6 @@ public interface BaseService<T extends BaseEntity> {
     boolean existsWithPrimaryKey(Object key) throws BusinessException;
 
     /**
-     * 根据实体中的属性进行查询，只能有一个返回值，有多个结果是抛出异常，查询条件使用等号
-     *
-     * @param entity 对象实体
-     * @return 返回null为未查询到结果，返回对象为查询结果，返回多个结果则抛出异常
-     */
-    T selectOne(T entity) throws BusinessException;
-
-    /**
-     * 根据主键字段进行查询，方法参数必须包含完整的主键属性，查询条件使用等号
-     *
-     * @param key 主键
-     * @return 返回null为未查询到结果，返回对象为查询结果
-     */
-    T selectByPrimaryKey(Object key) throws BusinessException;
-
-    /**
      * 根据主键字段进行查询复合嵌套的整体对象（如有），方法参数必须包含完整的主键属性，查询条件使用等号
      *
      * @param id 主键
@@ -102,7 +86,15 @@ public interface BaseService<T extends BaseEntity> {
     T selectComplexById(String id) throws BusinessException;
 
     /**
-     * 根据实体中的属性查询总数，查询条件使用等号
+     * 根据实体中的属性查询，可选择查询条件
+     *
+     * @param entity 对象实体
+     * @return 返回null为未查询到结果，返回对象为查询结果
+     */
+    T selectByCondition(T entity) throws BusinessException;
+
+    /**
+     * 根据实体中的属性查询总数，可选择查询条件
      *
      * @param entity 对象实体
      * @return 返回查询结果数量
@@ -110,7 +102,7 @@ public interface BaseService<T extends BaseEntity> {
     int selectCount(T entity) throws BusinessException;
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用等号，分页返回
+     * 根据实体中的属性值进行查询，可选择查询条件，分页返回
      *
      * @param entity   对象实体
      * @param pageNum  页数
@@ -128,7 +120,7 @@ public interface BaseService<T extends BaseEntity> {
     public List<String> findGroupBy(T entity) throws BusinessException;
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，并列查询取交集，分组返回
+     * 根据实体中的属性值进行查询，可选择查询条件，分组返回
      *
      * @param entity 对象实体
      * @return 返回分组对象列表为查询结果
@@ -136,7 +128,7 @@ public interface BaseService<T extends BaseEntity> {
     public Map<String, List<T>> findMapGroupByCondition(T entity) throws BusinessException;
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，并列查询取交集，树形结构返回
+     * 根据实体中的属性值进行查询，可选择查询条件，树形结构返回
      *
      * @param entity 对象实体
      * @return 返回树形结构对象列表为查询结果

@@ -14,4 +14,7 @@ import java.lang.annotation.Target;
 public @interface CacheKey {
 
     public String field() default "";    //键值包含字段名
+
+    public String[] fields() default {};    //键值包含的字段名集合（建议不要同时使用两个属性）
+
 }

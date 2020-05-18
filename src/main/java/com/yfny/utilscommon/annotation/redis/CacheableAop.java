@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +27,8 @@ public class CacheableAop implements Ordered {
 
     @Autowired
     private RedisUtils redisUtil;
+
+    private List<String> keySuffixList = new ArrayList<>();
 
     @Around("@annotation(cache)")
     public Object cached(final ProceedingJoinPoint pjp, Cacheable cache) throws Throwable {
@@ -77,6 +80,7 @@ public class CacheableAop implements Ordered {
     public Object evictCache(ProceedingJoinPoint pjp, CacheEvict evict) throws Throwable {
         Object result = null;
         try {
+            keySuffixList = new ArrayList<>();
             String keySuffix = getCacheKey(pjp, evict);
             String[] objectKeyPrefix = evict.objectKeyPrefix();
             String[] listKeyPrefix = evict.listKeyPrefix();
@@ -190,11 +194,24 @@ public class CacheableAop implements Ordered {
                 for (Annotation an : pas[i]) {
                     if (an instanceof CacheKey) {
                         String field = ((CacheKey) an).field();
-                        Object object = ReflectUtils.getFieldValue(args[i], field);
-                        if (object != null) {
-                            keySuffix = "_" + object.toString();
+                        String[] fields = ((CacheKey) an).fields();
+                        if (StringUtils.isNotBlank(field) && fields.length == 0) {
+                            Object object = ReflectUtils.getFieldValue(args[i], field);
+                            if (object != null) {
+                                keySuffix = "_" + object.toString();
+                            }
+                            break;
+                        } else if (StringUtils.isBlank(field) && fields.length > 0) {
+                            for (String f : fields) {
+                                Object object = ReflectUtils.getFieldValue(args[i], f);
+                                String ks = "";
+                                if (object != null) {
+                                    ks = "_" + object.toString();
+                                    keySuffixList.add(ks);
+                                }
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -214,6 +231,11 @@ public class CacheableAop implements Ordered {
         // 清除对应缓存
         if (StringUtils.isNotBlank(keySuffix)) {
             redisUtil.deleteBySuffix(keySuffix);
+        }
+        if (keySuffixList != null && keySuffixList.size() > 0) {
+            for (String ks : keySuffixList) {
+                redisUtil.deleteBySuffix(ks);
+            }
         }
         for (String objectKey : objectKeyPrefix) {
             String key = objectKey + keySuffix;

@@ -11,7 +11,9 @@ import com.yfny.utilscommon.util.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 数据库连接工具
@@ -92,6 +94,7 @@ public class ConnectionUtil {
         statement = connection.createStatement();
         String sql = "SELECT TABLE_NAME,TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" + databaseName + "';";
         resultSet = statement.executeQuery(sql);
+        Map<String, String> tableMap = new HashMap<>();
         while (resultSet.next()) {
             String tableName = resultSet.getString("TABLE_NAME");
             String description = resultSet.getString("TABLE_COMMENT");
@@ -110,9 +113,12 @@ public class ConnectionUtil {
                 material.setPkProperty(StringUtil.columnName2PropertyName(primaryKey));
                 materials.add(material);
             }
+            tableMap.put(tableName, description);
         }
-        for (BCodeMaterials material : materials) {
-            setRelation(material);
+        if (tableMap.containsKey("t_database_relation")) {
+            for (BCodeMaterials material : materials) {
+                setRelation(material);
+            }
         }
         statement.close();
         resultSet.close();

@@ -7,6 +7,8 @@ import com.yfny.utilscommon.util.StringUtils;
 
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 树形结构基本定义
@@ -15,8 +17,8 @@ import java.io.Serializable;
  */
 public class BaseTree implements Serializable {
 
-    public final static String NODE_NUMBER = "NUMBER";//数字
-    public final static String NODE_STRING = "STRING";//字符
+    public final static String NODE_LEVEL = "LEVEL";//层级排序
+    public final static String NODE_LABEL = "LABEL";//名称排序
 
     @Transient
     private String id;//标识字段定义
@@ -31,7 +33,19 @@ public class BaseTree implements Serializable {
     private String level;//层级字段定义
 
     @Transient
+    private String rootId;//根节点
+
+    @Transient
+    private String leaf;//是否叶子节点
+
+    @Transient
+    private String orderBy;//排序依据
+
+    @Transient
     private String haveList;//是否返回列表
+
+    @Transient
+    private List<String> extraProps;//额外属性名列表
 
     public String getId() {
         return StringUtils.isNotBlank(id) ? id : "id";
@@ -65,11 +79,43 @@ public class BaseTree implements Serializable {
         this.level = level;
     }
 
+    public String getRootId() {
+        return rootId;
+    }
+
+    public void setRootId(String rootId) {
+        this.rootId = rootId;
+    }
+
+    public String getLeaf() {
+        return StringUtils.isNotBlank(leaf) ? leaf : "true";
+    }
+
+    public void setLeaf(String leaf) {
+        this.leaf = leaf;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
     public String getHaveList() {
         return StringUtils.isNotBlank(haveList) ? haveList : "false";
     }
 
     public void setHaveList(String haveList) {
         this.haveList = haveList;
+    }
+
+    public List<String> getExtraProps() {
+        return extraProps != null ? extraProps : new ArrayList<>();
+    }
+
+    public void setExtraProps(List<String> extraProps) {
+        this.extraProps = extraProps;
     }
 }

@@ -16,28 +16,19 @@ import java.util.List;
 public interface ${ClassName}Mapper extends BaseMapper<${ClassName}Entity> {
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，并列查询取交集
+     * 根据实体中的属性值进行条件查询
      *
      * @param   ${ClassName?uncap_first} 对象实体
      * @return  返回对象列表为查询结果
      */
-    @SelectProvider(type = ${ClassName}SqlBuilder.class, method = "buildFind${ClassName}ByAndCondition")
-    List<${ClassName}Entity> findListByAndCondition(@Param("${ClassName?uncap_first}") ${ClassName}Entity ${ClassName?uncap_first});
-
-    /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，亦或查询取并集
-     *
-     * @param   ${ClassName?uncap_first} 对象实体
-     * @return  返回对象列表为查询结果
-     */
-    @SelectProvider(type = ${ClassName}SqlBuilder.class, method = "buildFind${ClassName}ByORCondition")
-    List<${ClassName}Entity> findListByORCondition(@Param("${ClassName?uncap_first}") ${ClassName}Entity ${ClassName?uncap_first});
+    @SelectProvider(type = ${ClassName}SqlBuilder.class, method = "buildFind${ClassName}ByCondition")
+    List<${ClassName}Entity> findListByCondition(@Param("${ClassName?uncap_first}") ${ClassName}Entity ${ClassName?uncap_first});
 
     /**
      * 定义实体中分组维度，并返回分组
      *
-     * @param ${ClassName?uncap_first} 对象实体
-     * @return 返回对象列表为查询结果
+     * @param   ${ClassName?uncap_first} 对象实体
+     * @return  返回对象列表为查询结果
      */
     @SelectProvider(type = ${ClassName}SqlBuilder.class, method = "buildFind${ClassName}GroupBy")
     List<String> findGroupBy(@Param("${ClassName?uncap_first}") ${ClassName}Entity ${ClassName?uncap_first});
@@ -45,18 +36,19 @@ public interface ${ClassName}Mapper extends BaseMapper<${ClassName}Entity> {
     /**
      * 根据实体主键查询实体对象，返回查询的实体对象
      *
+     * @param   ${ClassName?uncap_first} 对象实体
+     * @return  返回对象为查询结果
+     */
+    @SelectProvider(type = ${ClassName}SqlBuilder.class, method = "buildFind${ClassName}ByCondition")
+    ${ClassName}Entity selectByCondition(@Param("${ClassName?uncap_first}") ${ClassName}Entity ${ClassName?uncap_first});
+
+    /**
+     * 根据实体主键查询实体对象，返回查询的实体对象
+     *
      * @param id 对象实体主键
      * @return 返回对象为查询结果
      */
-    @Select("SELECT * FROM ${TableName} WHERE ${PrimaryKey} = ${r'#{id}'}")
-    @Results({
-            @Result(id = true, column = "${PrimaryKey}", property = "${PkProperty}"),
-    <#list ColumnInfoList as ColumnInfo>
-        <#if !ColumnInfo.primaryKey>
-            @Result(column = "${ColumnInfo.columnName}", property = "${ColumnInfo.propertyName}"),
-        </#if>
-    </#list>
-    })
+    @Select("SELECT * FROM ${TableName} WHERE ID = <#noparse>#{</#noparse>id<#noparse>}</#noparse>")
     ${ClassName}Entity selectById(@Param("id") String id);
 
     <#list ForeignKeyList as Foreign>

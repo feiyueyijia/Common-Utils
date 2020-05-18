@@ -246,9 +246,9 @@ public class FileUtil {
     public final static int CONSUMER = 1;//服务消费者API
 
     private static String getBasicPath() {
-        return "/WorkSpace/Auto/";
+        return ConfigUtil.getConfiguration().getFilePath();
     }
-
+    
     private static String getProducerPath(String projectName) {
         String path = getBasicPath() + "Service-" + projectName + "/";
         return path;

@@ -10,6 +10,7 @@ import com.yfny.utilscommon.annotation.redis.CommonCacheTime;
 import com.yfny.utilscommon.basemvc.common.BaseEntity;
 import com.yfny.utilscommon.basemvc.common.BaseTree;
 import com.yfny.utilscommon.basemvc.common.BusinessException;
+import com.yfny.utilscommon.basemvc.common.ExtraProp;
 import com.yfny.utilscommon.strategy.PageResultStrategy;
 import com.yfny.utilscommon.util.MultipleTreeUtils;
 import com.yfny.utilscommon.util.ReflectUtils;
@@ -210,27 +211,6 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     }
 
     /**
-     * 根据实体中的属性进行查询，只能有一个返回值，有多个结果是抛出异常，查询条件使用等号
-     *
-     * @param entity 对象实体
-     * @return 返回null为未查询到结果，返回对象为查询结果，返回多个结果则抛出异常
-     */
-    public T selectOne(T entity) throws BusinessException {
-        return getBaseMapper().selectOne(entity);
-    }
-
-    /**
-     * 根据主键字段进行查询，方法参数必须包含完整的主键属性，查询条件使用等号
-     *
-     * @param key 主键
-     * @return 返回null为未查询到结果，返回对象为查询结果
-     */
-    @Cacheable(expire = CommonCacheTime.ONE_WEEK)
-    public T selectByPrimaryKey(@CacheKey Object key) throws BusinessException {
-        return getBaseMapper().selectByPrimaryKey(key);
-    }
-
-    /**
      * 根据主键字段进行查询复合嵌套的整体对象（如有），方法参数必须包含完整的主键属性，查询条件使用等号
      *
      * @param id 主键
@@ -246,6 +226,20 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     }
 
     /**
+     * 根据实体中的属性查询，可选择查询条件
+     *
+     * @param entity 对象实体
+     * @return 返回null为未查询到结果，返回对象为查询结果
+     */
+    public T selectByCondition(T entity) throws BusinessException {
+        try {
+            return getBaseMapper().selectByCondition(entity);
+        } catch (Exception e) {
+            throw new BusinessException("sys.custom.error", "查询结果不唯一，请确认查询条件的唯一性！");
+        }
+    }
+
+    /**
      * 根据实体中的属性查询总数，查询条件使用等号
      *
      * @param entity 对象实体
@@ -256,7 +250,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     }
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，分页返回
+     * 根据实体中的属性值进行查询，可选择查询条件，分页返回
      *
      * @param entity   对象实体
      * @param pageNum  页数
@@ -266,18 +260,12 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     public List<T> findList(T entity, String pageNum, String pageSize) throws BusinessException {
         try {
             PageResultStrategy pageResultStrategy = null;
-            switch (entity.getLogical() + entity.getComplexRate()) {
-                case BaseEntity.AND + BaseEntity.NORMAL:
-                    pageResultStrategy = () -> getBaseMapper().findListByAndCondition(entity);
+            switch (entity.getComplexRate()) {
+                case BaseEntity.NORMAL:
+                    pageResultStrategy = () -> getBaseMapper().findListByCondition(entity);
                     break;
-                case BaseEntity.AND + BaseEntity.COMPLEX:
-                    pageResultStrategy = () -> getBaseMapper().findComplexListByAndCondition(entity);
-                    break;
-                case BaseEntity.OR + BaseEntity.NORMAL:
-                    pageResultStrategy = () -> getBaseMapper().findListByORCondition(entity);
-                    break;
-                case BaseEntity.OR + BaseEntity.COMPLEX:
-                    pageResultStrategy = () -> getBaseMapper().findComplexListByORCondition(entity);
+                case BaseEntity.COMPLEX:
+                    pageResultStrategy = () -> getBaseMapper().findComplexListByCondition(entity);
                     break;
                 default:
                     break;
@@ -299,14 +287,14 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     }
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，并列查询取交集，分组返回
+     * 根据实体中的属性值进行查询，可选择查询条件，分组返回
      *
      * @param entity 对象实体
      * @return 返回分组对象列表为查询结果
      */
     public Map<String, List<T>> findMapGroupByCondition(T entity) throws BusinessException {
         Map<String, List<T>> resultMap = new HashMap<>();
-        List<T> list = getBaseMapper().findListByAndCondition(entity);
+        List<T> list = getBaseMapper().findListByCondition(entity);
         String groupBy = entity.getGroupBy();
         if (StringUtils.isNotBlank(groupBy)) {
             for (T object : list) {
@@ -327,7 +315,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     }
 
     /**
-     * 根据实体中的属性值进行查询，查询条件使用LIKE，并列查询取交集，树形结构返回
+     * 根据实体中的属性值进行查询，可选择查询条件，树形结构返回
      *
      * @param entity 对象实体
      * @return 返回树形结构对象列表为查询结果
@@ -341,7 +329,12 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
             String idFiled = treeConfig.getId();
             String nameField = treeConfig.getName();
             String parentIdField = treeConfig.getParentId();
+            String rootId = treeConfig.getRootId();
             String levelFiled = treeConfig.getLevel();
+            String leaf = treeConfig.getLeaf();
+            String orderBy = treeConfig.getOrderBy();
+            String haveList = treeConfig.getHaveList();
+            List<String> extraPropsFiled = treeConfig.getExtraProps();
             for (T object : list) {
                 Map<String, Object> map = new HashMap<>();
                 Object id = ReflectUtils.getFieldValue(object, idFiled);
@@ -351,22 +344,44 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
                 if (StringUtils.isNotBlank(levelFiled)) {
                     level = ReflectUtils.getFieldValue(object, levelFiled);
                 }
-
+                if (id.equals(rootId)) {
+                    parentId = null;
+                }
                 map.put("id", id);
                 map.put("name", name);
                 map.put("parentId", parentId);
                 map.put("level", level);
+                List<ExtraProp> extraProps = null;
+                if (extraPropsFiled != null && extraPropsFiled.size() > 0) {
+                    extraProps = new ArrayList<>();
+                    for (String propName : extraPropsFiled) {
+                        ExtraProp prop = new ExtraProp();
+                        Object propValue = ReflectUtils.getFieldValue(object, propName);
+                        prop.setPropName(propName);
+                        prop.setPropValue(propValue);
+                        extraProps.add(prop);
+                    }
+                }
+                map.put("extraProps", extraProps);
                 mapList.add(map);
             }
-            String treeStr = MultipleTreeUtils.getTreeList(mapList);
+            boolean isLeaf = true;
+            String order = BaseTree.NODE_LABEL;
+            if ("false".equals(leaf)) {
+                isLeaf = false;
+            }
+            if (BaseTree.NODE_LEVEL.equals(orderBy)) {
+                order = orderBy;
+            }
+            String treeStr = MultipleTreeUtils.getTreeList(mapList, isLeaf, order);
             List<T> treeList = new ArrayList<>();
-            if ("true".equals(entity.getTreeConfig().getHaveList())) {
+            if ("true".equals(haveList)) {
                 treeList = list;
             }
             resultMap.put("tree", treeStr);
             resultMap.put("list", treeList);
-        } catch (NullPointerException e) {
-            throw new BusinessException("sys.custom.error", "未检测到树形结构依据，请添加树形依据或者使用其他接口！");
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
             throw new BusinessException("sys.custom.error", "树形结构依据错误，请检查数据是否符合树形结构格式！");
         }

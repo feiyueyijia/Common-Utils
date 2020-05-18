@@ -12,6 +12,7 @@ public class Configuration implements Serializable {
     private String author;
     private String packageName;
     private String projectName;
+    private String filePath;
     private Path path;
     private Db db;
 
@@ -42,6 +43,14 @@ public class Configuration implements Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getFilePath() {
+        return filePath == null ? "/Auto" : filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public Path getPath() {

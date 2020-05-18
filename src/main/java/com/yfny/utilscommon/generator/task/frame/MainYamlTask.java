@@ -40,14 +40,14 @@ public class MainYamlTask extends AbstractTask {
         dataMap.put("ProjectArtifactId", artifactId);
         dataMap.put("IsLocal", false);
         String filePath = FileUtil.getResourcePath(projectName, type);
-        String fileName = "application.yaml";
+        String fileName = "application.yml";
         // 生成application.yaml文件
         System.out.println("Generating " + fileName);
         FileUtil.generateToJava(FrameFreemarkerConfigUtils.TYPE_MAIN_YAML, dataMap, filePath + fileName);
 
         // 生成application.yaml文件
         dataMap.put("IsLocal", true);
-        fileName = "application-local.yaml";
+        fileName = "application-local.yml";
         System.out.println("Generating " + fileName);
         FileUtil.generateToJava(FrameFreemarkerConfigUtils.TYPE_MAIN_YAML, dataMap, filePath + fileName);
     }

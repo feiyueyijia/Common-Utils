@@ -143,12 +143,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>RELEASE</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>RELEASE</version>
+            <version>4.1.1</version>
         </dependency>
         <!--导入导出excel依赖结束-->
 

@@ -36,7 +36,7 @@ public class ${ClassName}Controller {
     public InvokeResult insertSelective(@RequestBody ${ClassName}Entity entity) throws Exception {
         ${ClassName?uncap_first}Valid.validInsert(entity);
         int result = ${ClassName?uncap_first}Service.insertSelective(entity);
-        return InvokeResult.writeResult(result, "${ClassName?uncap_first}.create.success", "${ClassName?uncap_first}.create.failed");
+        return InvokeResult.writeResult(result, entity, "${ClassName?uncap_first}.create.success", "${ClassName?uncap_first}.create.failed");
     }
 
     /**
@@ -50,7 +50,7 @@ public class ${ClassName}Controller {
     public InvokeResult updateSelective(@RequestBody ${ClassName}Entity entity) throws Exception {
         ${ClassName?uncap_first}Valid.validUpdate(entity);
         int result = ${ClassName?uncap_first}Service.updateSelective(entity);
-        return InvokeResult.writeResult(result, "${ClassName?uncap_first}.update.success", "${ClassName?uncap_first}.update.failed");
+        return InvokeResult.writeResult(result, entity, "${ClassName?uncap_first}.update.success", "${ClassName?uncap_first}.update.failed");
     }
 
     /**
@@ -64,7 +64,7 @@ public class ${ClassName}Controller {
     public InvokeResult delete(@RequestBody ${ClassName}Entity entity) throws Exception {
         ${ClassName?uncap_first}Valid.validDelete(entity);
         int result = ${ClassName?uncap_first}Service.delete(entity);
-        return InvokeResult.writeResult(result, "${ClassName?uncap_first}.delete.success", "${ClassName?uncap_first}.delete.failed");
+        return InvokeResult.writeResult(result, entity, "${ClassName?uncap_first}.delete.success", "${ClassName?uncap_first}.delete.failed");
     }
 
     /**
@@ -90,20 +90,7 @@ public class ${ClassName}Controller {
     @ResponseBody
     public InvokeResult selectOne(@RequestBody ${ClassName}Entity entity) throws Exception {
         ${ClassName?uncap_first}Valid.validSelect(entity);
-        ${ClassName}Entity result = ${ClassName?uncap_first}Service.selectOne(entity);
-        return InvokeResult.readResult(result, "${ClassName?uncap_first}.loadOne.success", "${ClassName?uncap_first}.loadOne.failed");
-    }
-
-    /**
-     * 根据主键字段进行查询，方法参数必须包含完整的主键属性，查询条件使用等号
-     *
-     * @param key 主键
-     * @return 返回null为未查询到结果，返回对象为查询结果
-     */
-    @GetMapping(value = "/selectByPrimaryKey")
-    @ResponseBody
-    public InvokeResult selectByPrimaryKey(@RequestParam(value = "key") Object key) throws Exception {
-        ${ClassName}Entity result = ${ClassName?uncap_first}Service.selectByPrimaryKey(key);
+        ${ClassName}Entity result = ${ClassName?uncap_first}Service.selectByCondition(entity);
         return InvokeResult.readResult(result, "${ClassName?uncap_first}.loadOne.success", "${ClassName?uncap_first}.loadOne.failed");
     }
 

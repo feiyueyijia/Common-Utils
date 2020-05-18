@@ -11,12 +11,6 @@ import java.util.List;
  */
 public class BaseEntity implements Serializable {
 
-    public final static String ASC = "ASC";//升序
-    public final static String DESC = "DESC";//降序
-
-    public final static String AND = "AND";//逻辑与
-    public final static String OR = "OR";//逻辑或
-
     public final static String NORMAL = "NORMAL";//正常
     public final static String COMPLEX = "COMPLEX";//复杂
 
@@ -44,13 +38,13 @@ public class BaseEntity implements Serializable {
     private String groupBy;//分组字段
 
     @Transient
-    private String logical = AND;//列表条件逻辑指定，默认为AND
-
-    @Transient
     private String complexRate = NORMAL;//列表条件复杂度指定，默认为NORMAL
 
     @Transient
     private BaseTree treeConfig;//树形结构指定
+
+    @Transient
+    private List<BaseQuery> queries;//排序字段及排序方式（升序，降序）
 
     @Transient
     private List<BaseOrder> orders;//排序字段及排序方式（升序，降序）
@@ -65,10 +59,10 @@ public class BaseEntity implements Serializable {
     private String param1;//备用参数1
 
     @Transient
-    private String param2;//备用参数1
+    private String param2;//备用参数2
 
     @Transient
-    private String param3;//备用参数1
+    private String param3;//备用参数3
 
     public BaseEntity() {
 
@@ -83,7 +77,7 @@ public class BaseEntity implements Serializable {
     }
 
     public Integer getPageNum() {
-        return pageNum;
+        return pageNum != null && pageNum > 0 ? pageNum : 1;
     }
 
     public void setPageNum(Integer pageNum) {
@@ -91,7 +85,7 @@ public class BaseEntity implements Serializable {
     }
 
     public Integer getPageSize() {
-        return pageSize;
+        return pageSize != null && pageSize >= 0 ? pageSize : 20;
     }
 
     public void setPageSize(Integer pageSize) {
@@ -122,14 +116,6 @@ public class BaseEntity implements Serializable {
         this.groupBy = groupBy;
     }
 
-    public String getLogical() {
-        return logical;
-    }
-
-    public void setLogical(String logical) {
-        this.logical = logical;
-    }
-
     public String getComplexRate() {
         return complexRate;
     }
@@ -144,6 +130,14 @@ public class BaseEntity implements Serializable {
 
     public void setTreeConfig(BaseTree treeConfig) {
         this.treeConfig = treeConfig;
+    }
+
+    public List<BaseQuery> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<BaseQuery> queries) {
+        this.queries = queries;
     }
 
     public List<BaseOrder> getOrders() {

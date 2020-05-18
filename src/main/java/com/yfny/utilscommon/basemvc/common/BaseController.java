@@ -87,20 +87,7 @@ public class BaseController {
     @ResponseBody
     public InvokeResult selectOne(@RequestBody BaseEntity entity) throws Exception {
         baseValid.validSelect(entity);
-        BaseEntity result = baseService.selectOne(entity);
-        return InvokeResult.readResult(result, "business.loadOne.success", "business.loadOne.failed");
-    }
-
-    /**
-     * 根据主键字段进行查询，方法参数必须包含完整的主键属性，查询条件使用等号
-     *
-     * @param key 主键
-     * @return 返回null为未查询到结果，返回对象为查询结果
-     */
-    @GetMapping(value = "/selectByPrimaryKey")
-    @ResponseBody
-    public InvokeResult selectByPrimaryKey(@RequestParam(value = "key") Object key) throws Exception {
-        BaseEntity result = baseService.selectByPrimaryKey(key);
+        BaseEntity result = baseService.selectByCondition(entity);
         return InvokeResult.readResult(result, "business.loadOne.success", "business.loadOne.failed");
     }
 

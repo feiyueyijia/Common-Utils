@@ -97,6 +97,26 @@ public class InvokeResult<T> {
     }
 
     /**
+     * 执行写入时的返回结果
+     *
+     * @param result      数据库写入结果
+     * @param result2     数据库写入对象
+     * @param successCode 成功编码
+     * @param failureCode 正常失败编码
+     * @param params
+     * @return 统一调用响应格式
+     */
+    public static InvokeResult writeResult(int result, Object result2, String successCode, String failureCode, String... params) {
+        if (result == 1) {
+            Object pkValue = ReflectUtils.getPKValue(result2);
+            return InvokeResult.success(successCode, pkValue);
+        } else if (result == -1) {
+            return InvokeResult.failure("sys.request.failed", "网络请求超时或服务器崩溃");
+        }
+        return InvokeResult.failure(failureCode, params);
+    }
+
+    /**
      * 执行读取时的返回结果
      *
      * @param result      数据库读取结果

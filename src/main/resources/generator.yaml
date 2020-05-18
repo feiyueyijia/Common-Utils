@@ -3,4 +3,5 @@ db:
   username: root
   password: root
 author: auto
-packageName: com.yfny.assetinfo
+packageName: com.yfny.datamodel
+filePath: /WorkSpace/Auto/

@@ -204,7 +204,7 @@
                 <!-- Nacos地址 -->
                 <nacos.addr>127.0.0.1:8848</nacos.addr>
                 <!-- Nacos空间标识 -->
-                <nacos.namespace>576f8824-5af7-45ff-97c4-c90080208e1e</nacos.namespace>
+                <nacos.namespace>985a9ec4-f51a-4ad7-ac91-7d86fe2e6a5b</nacos.namespace>
             </properties>
         </profile>
         <profile>

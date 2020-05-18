@@ -3,10 +3,8 @@ package com.yfny.utilscommon.basemvc.producer;
  * Created by jisongZhou on 2019/10/29.
  **/
 
-import com.yfny.utilscommon.basemvc.common.BaseEntity;
-import com.yfny.utilscommon.basemvc.common.BaseNumScope;
-import com.yfny.utilscommon.basemvc.common.BaseOrder;
-import com.yfny.utilscommon.basemvc.common.BaseTimeScope;
+import com.alibaba.nacos.api.config.filter.IFilterConfig;
+import com.yfny.utilscommon.basemvc.common.*;
 import com.yfny.utilscommon.util.ReflectUtils;
 
 import java.util.List;
@@ -24,6 +22,30 @@ public class BaseSqlBuilder {
             orSql = " ||";
         }
         return orSql + " '%'";
+    }
+
+    protected <T extends BaseEntity> String queryBy(T entity, String entityName, String column, String property) {
+        String queryType = " = ";
+        String logical = "";
+        String sqlResult = column + queryType + "#{" + entityName + "." + property + "}" + logical;
+        if (entity.getQueries() != null && entity.getQueries().size() > 0) {
+            List<BaseQuery> queries = entity.getQueries();
+            for (BaseQuery query : queries) {
+                if (property.equals(query.getQueryBy())) {
+                    if (BaseQuery.UNEQUAL.equals(query.getQueryType())) {
+                        queryType = " != ";
+                    } else if (BaseQuery.LIKE.equals(query.getQueryType())) {
+                        queryType = " LIKE ";
+                        logical = " '%'";
+                    }
+                    if (BaseQuery.OR.equals(query.getLogical())) {
+                        logical = " ||";
+                    }
+                    sqlResult = column + queryType + "#{" + entityName + "." + property + "}" + logical;
+                }
+            }
+        }
+        return sqlResult;
     }
 
     protected <T extends BaseEntity> String numScope(T entity, BaseNumScope scope) {
@@ -71,7 +93,7 @@ public class BaseSqlBuilder {
                 } else {
                     orderBy = orderColumn;
                 }
-                if (BaseEntity.DESC.equals(order.getOrderSort())) {
+                if (BaseOrder.DESC.equals(order.getOrderSort())) {
                     sqlResult = sqlResult + orderBy + " DESC";
                 } else {
                     sqlResult = sqlResult + orderBy + " ASC";
