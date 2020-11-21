@@ -1,5 +1,7 @@
 package com.yfny.utilscommon.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,8 @@ public class InvokeResult<T> {
     private ConfigurableApplicationContext applicationContext;
 
     private static InvokeResult invokeResult;
+
+    private static final Logger logger = LoggerFactory.getLogger(InvokeResult.class);
 
     @PostConstruct
     public void init() {
@@ -150,6 +154,9 @@ public class InvokeResult<T> {
         data = data != null ? data : StringUtils.isUTF8(message);
         if (type == SUCCESS) {
             code = "sys.request.success";
+            logger.info(message);
+        }else {
+            logger.warn(message);
         }
         result.setCode(code);
         result.setMessage(message);

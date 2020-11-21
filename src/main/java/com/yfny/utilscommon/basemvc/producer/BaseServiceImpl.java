@@ -321,9 +321,16 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
      * @return 返回树形结构对象列表为查询结果
      */
     public Map<String, Object> getTreeOf(T entity) throws BusinessException {
+        Map<String, Object> resultMap = getTreeOf(entity, null);
+        return resultMap;
+    }
+
+    public Map<String, Object> getTreeOf(T entity, List<T> list) throws BusinessException {
         Map<String, Object> resultMap = new HashMap<>();
-        List<T> list = findList(entity, null, null);
         List<Map<String, Object>> mapList = new ArrayList<>();
+        if (list == null || list.size() == 0) {
+            list = findList(entity, null, null);
+        }
         try {
             BaseTree treeConfig = entity.getTreeConfig();
             String idFiled = treeConfig.getId();

@@ -9,8 +9,8 @@ import com.yfny.utilscommon.util.ReflectUtils;
 import com.yfny.utilscommon.util.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
@@ -154,7 +154,7 @@ public class ExportExcel {
                 }
                 headerList.add(t);
             }
-            initialize(title[in], headerList);
+            initialize(title[in], headerList, 1);
             annotationList.clear();
 
         }
@@ -168,40 +168,63 @@ public class ExportExcel {
      */
     public ExportExcel(String title, String[] headers) {
         this.wb = new SXSSFWorkbook(500);
-        initialize(title, Lists.newArrayList(headers));
+        initialize(title, Lists.newArrayList(headers), 1);
     }
 
-	/**
-	 * 构造函数
-	 * @param title 表格标题，传“空值”，表示无标题
-	 * @param headerList 表头列表
-	 */
-	public ExportExcel(String title, List<String> headerList) {
+    /**
+     * 构造函数
+     *
+     * @param title      表格标题，传“空值”，表示无标题
+     * @param headerList 表头列表
+     */
+    public ExportExcel(String title, List<String> headerList) {
         this.wb = new SXSSFWorkbook(500);
-		initialize(title, headerList);
-	}
+        initialize(title, headerList, 1);
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param titles     表格标题，传“空值”，表示无标题
+     * @param headerList 表头列表
+     */
+    public ExportExcel(String[] titles, List<String> headerList, String type) {
+        this.wb = new SXSSFWorkbook(500);
+        int no = 1;
+        for (String title : titles) {
+            initialize(title, headerList, no);
+            no++;
+        }
+    }
 
     /**
      * 初始化函数
      *
      * @param title      表格标题，传“空值”，表示无标题
      * @param headerList 表头列表
+     * @param no         工作表数量
      */
-    private void initialize(String title, List<String> headerList) {
-        this.sheet = wb.createSheet(title);
+    private void initialize(String title, List<String> headerList, int no) {
+        rownum = 0;
+        if (StringUtils.isNotBlank(title)) {
+            this.sheet = wb.createSheet(title);
+        } else {
+            this.sheet = wb.createSheet("Sheet" + no);
+        }
+
         this.styles = createStyles(wb);
         // Create title
 
-        if (StringUtils.isNotBlank(title)) {
-            rownum = 0;
-            Row titleRow = sheet.createRow(rownum++);
-            titleRow.setHeightInPoints(30);
-            Cell titleCell = titleRow.createCell(0);
-            titleCell.setCellStyle(styles.get("title"));
-            titleCell.setCellValue(title);
-            sheet.addMergedRegion(new CellRangeAddress(titleRow.getRowNum(),
-                    titleRow.getRowNum(), titleRow.getRowNum(), headerList.size() - 1));
-        }
+//        if (StringUtils.isNotBlank(title)) {
+//            rownum = 0;
+//            Row titleRow = sheet.createRow(rownum++);
+//            titleRow.setHeightInPoints(30);
+//            Cell titleCell = titleRow.createCell(0);
+//            titleCell.setCellStyle(styles.get("title"));
+//            titleCell.setCellValue(title);
+//            sheet.addMergedRegion(new CellRangeAddress(titleRow.getRowNum(),
+//                    titleRow.getRowNum(), titleRow.getRowNum(), headerList.size() - 1));
+//        }
         // Create header
         if (headerList == null) {
             throw new RuntimeException("headerList not null!");
@@ -211,6 +234,7 @@ public class ExportExcel {
         for (int i = 0; i < headerList.size(); i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellStyle(styles.get("header"));
+
             String[] ss = StringUtils.split(headerList.get(i), "**", 2);
             if (ss.length == 2) {
                 cell.setCellValue(ss[0]);
@@ -262,26 +286,30 @@ public class ExportExcel {
         dataFont.setFontName("Arial");
         dataFont.setFontHeightInPoints((short) 10);
         style.setFont(dataFont);
+        style.setWrapText(true);
         styles.put("data", style);
 
         style = wb.createCellStyle();
         style.cloneStyleFrom(styles.get("data"));
         style.setAlignment(HorizontalAlignment.LEFT);
+        style.setWrapText(true);
         styles.put("data1", style);
 
         style = wb.createCellStyle();
         style.cloneStyleFrom(styles.get("data"));
         style.setAlignment(HorizontalAlignment.CENTER);
+        style.setWrapText(true);
         styles.put("data2", style);
 
         style = wb.createCellStyle();
         style.cloneStyleFrom(styles.get("data"));
         style.setAlignment(HorizontalAlignment.RIGHT);
+        style.setWrapText(true);
         styles.put("data3", style);
 
         style = wb.createCellStyle();
         style.cloneStyleFrom(styles.get("data"));
-//		style.setWrapText(true);
+		//style.setWrapText(true);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -304,6 +332,15 @@ public class ExportExcel {
         return sheet.createRow(rownum++);
     }
 
+
+    /**
+     * 添加一行
+     *
+     * @return 行对象
+     */
+    public Row addRow(Sheet sheet) {
+        return sheet.createRow(rownum++);
+    }
 
     /**
      * 添加一个单元格
@@ -476,41 +513,68 @@ public class ExportExcel {
         return this;
     }
 
-	/**
-	 * 导出测试
-	 */
-	public static void main(String[] args) throws Throwable {
+    public SXSSFWorkbook getWb() {
+        return wb;
+    }
 
-		List<String> headerList = Lists.newArrayList();
-		for (int i = 1; i <= 10; i++) {
-			headerList.add("表头"+i);
-		}
+    public void setWb(SXSSFWorkbook wb) {
+        this.wb = wb;
+    }
 
-		List<String> dataRowList = Lists.newArrayList();
-		for (int i = 1; i <= headerList.size(); i++) {
-			dataRowList.add("数据"+i);
-		}
+    public int getRownum() {
+        return rownum;
+    }
 
-		List<List<String>> dataList = Lists.newArrayList();
-		for (int i = 1; i <=100; i++) {
-			dataList.add(dataRowList);
-		}
+    public void setRownum(int rownum) {
+        this.rownum = rownum;
+    }
 
-		ExportExcel ee = new ExportExcel("表格标题", headerList);
+    /**
+     * 导出测试
+     */
+    public static void main(String[] args) throws Throwable {
 
-		for (int i = 0; i < dataList.size(); i++) {
-			Row row = ee.addRow();
-			for (int j = 0; j < dataList.get(i).size(); j++) {
-				ee.addCell(row, j, dataList.get(i).get(j));
-			}
-		}
+        List<String> headerList = Lists.newArrayList();
+        for (int i = 1; i <= 10; i++) {
+            headerList.add("表头" + i);
+        }
 
-		ee.writeFile("target/export.xlsx");
+        List<String> dataRowList = Lists.newArrayList();
+        for (int i = 1; i <= headerList.size(); i++) {
+            if (i == 10) {
+                ArrayList<String> arrayList = new ArrayList<String>();
+                arrayList.add("数据" + i);
+                arrayList.add("数据" + i);
+                String row = String.join("\n", arrayList);
+                dataRowList.add(row);
+            } else {
+                dataRowList.add("数据" + i);
+            }
+        }
 
-		ee.dispose();
+        List<List<String>> dataList = Lists.newArrayList();
+        for (int i = 1; i <= 100; i++) {
+            dataList.add(dataRowList);
+        }
 
-		log.debug("Export success.");
+        String[] titles = {"Sheet1", "Sheet2"};
+        ExportExcel ee = new ExportExcel(titles, headerList, "");
+        for (int s = 0; s < ee.wb.getNumberOfSheets(); s++) {
+            ee.rownum = 1;
+            for (int i = 0; i < dataList.size(); i++) {
+                Row row = ee.addRow(ee.wb.getSheetAt(s));
+                for (int j = 0; j < dataList.get(i).size(); j++) {
+                    ee.addCell(row, j, dataList.get(i).get(j));
+                }
+            }
+        }
 
-	}
+        ee.writeFile("target/export.xlsx");
+
+        ee.dispose();
+
+        log.debug("Export success.");
+
+    }
 
 }

@@ -3,7 +3,6 @@ package com.yfny.utilscommon.basemvc.producer;
  * Created by jisongZhou on 2019/10/29.
  **/
 
-import com.alibaba.nacos.api.config.filter.IFilterConfig;
 import com.yfny.utilscommon.basemvc.common.*;
 import com.yfny.utilscommon.util.ReflectUtils;
 
