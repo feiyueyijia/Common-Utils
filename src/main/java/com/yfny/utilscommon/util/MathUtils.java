@@ -71,7 +71,6 @@ public class MathUtils {
         double result = 0;
         for (int i = 1; i <= count; i++) {
             result = result + Math.pow(value, i);
-            ;
         }
         return result;
     }

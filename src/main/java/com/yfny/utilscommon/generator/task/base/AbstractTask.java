@@ -82,8 +82,8 @@ public abstract class AbstractTask implements Serializable {
         dataMap.put("CompositePackageName", "composite");
         dataMap.put("ValidPackageName", "valid");
         dataMap.put("ControllerPackageName", controllerPackageName);
-        dataMap.put("APIUnitTestPackageName", "base");
-        dataMap.put("APIBaseTestPackageName", "unit");
+        dataMap.put("APIUnitTestPackageName", "unit");
+        dataMap.put("APIBaseTestPackageName", "base");
         dataMap.put("HystrixPackageName", "fallback");
         dataMap.put("ClientPackageName", "client");
         dataMap.put("Author", author);

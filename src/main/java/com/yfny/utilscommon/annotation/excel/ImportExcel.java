@@ -359,6 +359,14 @@ public class ImportExcel {
         return dataList;
     }
 
+    public Workbook getWb() {
+        return wb;
+    }
+
+    public void setWb(Workbook wb) {
+        this.wb = wb;
+    }
+
 	/**
 	 * 导入测试
 	 */

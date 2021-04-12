@@ -8,9 +8,10 @@ import com.yfny.utilscommon.util.Encodes;
 import com.yfny.utilscommon.util.ReflectUtils;
 import com.yfny.utilscommon.util.StringUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.common.usermodel.HyperlinkType;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
@@ -198,6 +199,21 @@ public class ExportExcel {
     }
 
     /**
+     * 构造函数
+     *
+     * @param titles     表格标题，传“空值”，表示无标题
+     * @param headerList 表头列表
+     */
+    public ExportExcel(String[] titles, List<List<String>> headerList, int type) {
+        this.wb = new SXSSFWorkbook(500);
+        int no = 1;
+        for (String title : titles) {
+            initialize(title, headerList.get(no - 1), no);
+            no++;
+        }
+    }
+
+    /**
      * 初始化函数
      *
      * @param title      表格标题，传“空值”，表示无标题
@@ -309,7 +325,7 @@ public class ExportExcel {
 
         style = wb.createCellStyle();
         style.cloneStyleFrom(styles.get("data"));
-		//style.setWrapText(true);
+        //style.setWrapText(true);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);

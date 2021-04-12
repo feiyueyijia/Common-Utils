@@ -12,10 +12,13 @@
     <description>基础工具类支持</description>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
         <nacos-spring.version>0.9.0.RELEASE</nacos-spring.version>
         <aspectjweaver.version>1.8.13</aspectjweaver.version>
-        <commons-lang3.version>3.5</commons-lang3.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <commons-text.version>1.9</commons-text.version>
         <json.version>20180813</json.version>
         <oss-parent.version>9</oss-parent.version>
         <commons-io.version>2.6</commons-io.version>
@@ -25,6 +28,7 @@
         <pagehelper-spring-boot.version>1.2.3</pagehelper-spring-boot.version>
         <txlcn.tx.version>5.0.2.RELEASE</txlcn.tx.version>
         <mysql-connector-java.version>5.1.47</mysql-connector-java.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     </properties>
 
     <distributionManagement>
@@ -80,6 +84,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
         </dependency>
         <!-- json依赖 -->
         <dependency>
@@ -178,12 +187,6 @@
             <version>5.6.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
-        </dependency>
-
         <!-- SLF4J日志框架API -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -245,6 +248,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>8</source>
                     <target>8</target>

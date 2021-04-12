@@ -1,7 +1,7 @@
 db:
-  url: jdbc:mysql://127.0.0.1:3306/aim_device_materials?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+  url: jdbc:mysql://127.0.0.1:3306/estimate_check?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
   username: root
-  password: root
+  password: Abc123#456
 author: auto
-packageName: com.device.materials
+packageName: com.estimate.check
 filePath: /WorkSpace/Auto/
