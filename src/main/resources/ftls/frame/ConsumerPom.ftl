@@ -14,9 +14,9 @@
     <description>SpringCloud 自动生成项目</description>
 
     <properties>
-        <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
-        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
-        <mysql-connector-java.version>5.1.47</mysql-connector-java.version>
+        <spring-boot.version>2.3.8.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
+        <mysql-connector-java.version>5.1.49</mysql-connector-java.version>
     </properties>
 
     <dependencies>

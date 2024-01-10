@@ -16,22 +16,22 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.4.RELEASE</version>
+        <version>2.3.8.RELEASE</version>
     </parent>
 
     <properties>
-        <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
-        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
-        <spring-tx.version>5.0.8.RELEASE</spring-tx.version>
+        <spring-boot.version>2.3.8.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
+        <spring-tx.version>5.2.18.RELEASE</spring-tx.version>
         <nacos-spring.version>0.9.0.RELEASE</nacos-spring.version>
         <cucumber.version>1.2.5</cucumber.version>
-        <mysql-connector-java.version>5.1.47</mysql-connector-java.version>
-        <druid.version>1.1.12</druid.version>
-        <mybatis-spring-boot.version>2.0.0</mybatis-spring-boot.version>
-        <mapper-spring-boot.version>2.1.3</mapper-spring-boot.version>
-        <pagehelper-spring-boot.version>1.2.3</pagehelper-spring-boot.version>
-        <mybatis-generator-maven-plugin.version>1.3.7</mybatis-generator-maven-plugin.version>
-        <fastjson.version>1.2.55</fastjson.version>
+        <mysql-connector-java.version>5.1.49</mysql-connector-java.version>
+        <druid.version>1.2.8</druid.version>
+        <mybatis-spring-boot.version>2.2.0</mybatis-spring-boot.version>
+        <mapper-spring-boot.version>2.1.5</mapper-spring-boot.version>
+        <pagehelper-spring-boot.version>1.4.0</pagehelper-spring-boot.version>
+        <mybatis-generator-maven-plugin.version>1.4.0</mybatis-generator-maven-plugin.version>
+        <fastjson.version>1.2.78</fastjson.version>
     </properties>
 
     <dependencies>

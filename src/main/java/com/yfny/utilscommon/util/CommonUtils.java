@@ -122,4 +122,65 @@ public class CommonUtils {
         });
         return list;
     }
+
+    /**
+     * 插入排序法
+     *
+     * @param arr 排序数组
+     * @return 完成排序数组
+     */
+    public static int[] insertSort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int temp = arr[i];
+            int j = i - 1;
+            while (temp < arr[j]) {
+                arr[j + 1] = arr[j];
+                j--;
+                if (j == -1) {
+                    break;
+                }
+            }
+            arr[j + 1] = temp;
+        }
+        return arr;
+    }
+
+
+    /**
+     * 快速排序法
+     *
+     * @param arr   排序数组
+     * @param left  排序最小边界
+     * @param right 排序最大边界
+     * @return 完成排序数组
+     */
+    public static int[] fastSort(int[] arr, int left, int right) {
+        if (left < right) {
+            int s = arr[left];
+            int i = left;
+            int j = right + 1;
+            while (true) {
+                //向右找大于s的元素的索引
+                while (i + 1 < arr.length && arr[++i] < s) ;
+                //向左找小于s的元素的索引
+                while (j - 1 > -1 && arr[--j] > s) ;
+                //如果i >= j 推出循环
+                if (i >= j) {
+                    break;
+                } else {
+                    //教化i和j位置的元素
+                    int t = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = t;
+                }
+            }
+            arr[left] = arr[j];
+            arr[j] = s;
+            //对左面进行递归
+            fastSort(arr, left, j - 1);
+            //对右面进行递归
+            fastSort(arr, j + 1, right);
+        }
+        return arr;
+    }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ASCII码转换工具
+ * 码转换工具
  * Author jisongZhou
  * Date  2019/11/5
  */

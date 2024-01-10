@@ -1,10 +1,7 @@
 package com.yfny.utilscommon.util;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 数学计算工具
@@ -54,10 +51,14 @@ public class MathUtils {
     }
 
     public static double mathAve(Double value, int size) {
+        return mathAve(value, size, 2);
+    }
+
+    public static double mathAve(Double value, int size, int scale) {
         double ave = 0;
         ave = value / size;
         BigDecimal bigDecimal = new BigDecimal(ave);
-        return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return bigDecimal.setScale(scale, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     public static double mathOpAve(Double value, int size) {
@@ -100,7 +101,7 @@ public class MathUtils {
     //正数随机
     public static int[] getRandom(int size, int min, int max) {
         //随机数量不能大于总数量
-        if (max - min < size) {
+        if (max - min < size - 1) {
             size = max - min;
         }
         Random random = new Random();
@@ -119,7 +120,45 @@ public class MathUtils {
             intRet[i] = Integer.parseInt(it.next().toString());
             i++;
         }
-        return intRet;
+        return CommonUtils.insertSort(intRet);
     }
 
+    /**
+     * 计算阶乘数，即n! = n * (n-1) * ... * 2 * 1
+     *
+     * @param n
+     * @return
+     */
+    public static long factorial(int n) {
+        return (n > 1) ? n * factorial(n - 1) : 1;
+    }
+
+    /**
+     * 计算排列数，即A(n, m) = n!/(n-m)!
+     *
+     * @param n
+     * @param m
+     * @return
+     */
+    public static long arrangement(int n, int m) {
+        return (n >= m) ? factorial(n) / factorial(n - m) : 0;
+    }
+
+    /**
+     * 计算组合数，即C(n, m) = n!/((n-m)! * m!)
+     *
+     * @param n
+     * @param m
+     * @return
+     */
+    public static long combination(int n, int m) {
+        return (n >= m) ? factorial(n) / (factorial(n - m) * factorial(m)) : 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(MathUtils.combination(35, 5));
+        //System.out.println(MathUtils.combination(16, 1));
+        //System.out.println(MathUtils.combination(33, 6) * 16);
+        //System.out.println(Arrays.toString(MathUtils.getRandom(2, 1, 2)));
+    }
 }

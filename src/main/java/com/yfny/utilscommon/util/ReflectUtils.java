@@ -12,7 +12,7 @@ import java.util.*;
 
 /**
  * 反射机制工具类
- * Created by jisongZhou on 2017/12/4.
+ * Created by jiSongZhou on 2017/12/4.
  **/
 public class ReflectUtils {
 
@@ -27,9 +27,8 @@ public class ReflectUtils {
         try {
             String firstLetter = fieldName.substring(0, 1).toUpperCase();
             String getter = "get" + firstLetter + fieldName.substring(1);
-            Method method = object.getClass().getMethod(getter, new Class[]{});
-            Object value = method.invoke(object, new Object[]{});
-            return value;
+            Method method = object.getClass().getMethod(getter);
+            return method.invoke(object);
         } catch (Exception e) {
             //System.out.println("属性不存在");
             return null;
@@ -39,16 +38,16 @@ public class ReflectUtils {
     /**
      * 使用反射根据属性名称设置属性值
      *
-     * @param clazz
-     * @param map
-     * @return
+     * @param clazz 类别
+     * @param map   属性集合
+     * @return 实体对象
      */
     public static Object setFieldValueByName(Class<?> clazz, Map<String, Object> map) {
         Object object = null;
         try {
             object = clazz.newInstance();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return setFieldValueByName(object, clazz, map);
     }
@@ -56,10 +55,10 @@ public class ReflectUtils {
     /**
      * 使用反射根据属性名称设置属性值
      *
-     * @param object
-     * @param clazz
-     * @param map
-     * @return
+     * @param object 实体对象
+     * @param clazz  类别
+     * @param map    属性集合
+     * @return 实体对象
      */
     public static Object setFieldValueByName(Object object, Class<?> clazz, Map<String, Object> map) {
         try {
@@ -68,7 +67,7 @@ public class ReflectUtils {
                 Field field = getDeclaredField(object, fieldName);
                 String firstLetter = fieldName.substring(0, 1).toUpperCase();
                 String setter = "set" + firstLetter + fieldName.substring(1);
-                Method method = clazz.getMethod(setter, new Class[]{field.getType()});
+                Method method = clazz.getMethod(setter, field.getType());
                 method.invoke(object, fieldValue);
             }
             return object;
@@ -81,10 +80,10 @@ public class ReflectUtils {
     /**
      * 获取对象的属性名称数组
      *
-     * @param object
-     * @return
+     * @param object 实体对象
+     * @return 属性名称数组
      */
-    public static String[] getFiledName(Object object) {
+    public static String[] getFieldName(Object object) {
         Field[] localFields = object.getClass().getDeclaredFields();
         Field[] superFields = object.getClass().getSuperclass().getDeclaredFields();
         int size = localFields.length + superFields.length;
@@ -104,8 +103,8 @@ public class ReflectUtils {
     /**
      * 复制非null属性
      *
-     * @param source
-     * @param result
+     * @param source 复制来源
+     * @param result 复制结果
      */
     public static void copyProperties(Object source, Object result) {
         copySuperProperties(source, result);
@@ -115,18 +114,18 @@ public class ReflectUtils {
     /**
      * 复制非null属性
      *
-     * @param source
-     * @param result
+     * @param source 复制来源
+     * @param result 复制结果
      */
     public static void copyLocalProperties(Object source, Object result) {
-        String[] fileds = getFiledName(source);
-        Map<String, Object> map = new HashMap<String, Object>();
-        for (String filed : fileds) {
-            Object value = getFieldValueByName(filed, source);
+        String[] fields = getFieldName(source);
+        Map<String, Object> map = new HashMap<>();
+        for (String field : fields) {
+            Object value = getFieldValueByName(field, source);
             if (value != null) {
-                map.put(filed, value);
+                map.put(field, value);
             } else {
-                setFieldValue(result, filed, null);
+                setFieldValue(result, field, null);
             }
         }
         setFieldValueByName(result, source.getClass(), map);
@@ -135,8 +134,8 @@ public class ReflectUtils {
     /**
      * 复制超类非null属性（超类动态获取太麻烦，写死好了）
      *
-     * @param source
-     * @param result
+     * @param source 复制来源
+     * @param result 复制结果
      */
     public static void copySuperProperties(Object source, Object result) {
 //        setFieldValue(result, "delFlag", getFieldValue(source, "delFlag"));
@@ -152,7 +151,7 @@ public class ReflectUtils {
      * @return 父类中的属性对象
      */
     public static Field getDeclaredField(Object object, String fieldName) {
-        Field field = null;
+        Field field;
         Class<?> clazz = object.getClass();
         for (; clazz != Object.class; clazz = clazz.getSuperclass()) {
             try {
@@ -181,9 +180,7 @@ public class ReflectUtils {
         try {
             //将 object 中 field 所代表的值 设置为 value
             field.set(object, value);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -212,15 +209,16 @@ public class ReflectUtils {
     /**
      * 获取对象中指定注解的字段名称
      *
-     * @param object 对象
-     * @param clazzs 注解类型
+     * @param object    对象
+     * @param clazzList 注解类型
      * @return 字段名列表
      */
-    public static List<String> getAnnotationFieldName(Object object, Class<? extends Annotation>... clazzs) {
+    @SafeVarargs
+    public static List<String> getAnnotationFieldName(Object object, Class<? extends Annotation>... clazzList) {
         Field[] localFields = object.getClass().getDeclaredFields();
         List<String> annotationFieldNameList = new ArrayList<>();
         for (Field annotationField : localFields) {
-            for (Class clazz : clazzs) {
+            for (Class<? extends Annotation> clazz : clazzList) {
                 if (annotationField.isAnnotationPresent(clazz)) {
                     annotationFieldNameList.add(annotationField.getName());
                 }
@@ -232,9 +230,9 @@ public class ReflectUtils {
     /**
      * 获取指定类中字段的数据库对应值
      *
-     * @param clazz
-     * @param fieldName
-     * @return
+     * @param clazz     类别
+     * @param fieldName 字段名称
+     * @return 字段值
      */
     public static String getColumnName(Class<?> clazz, String fieldName) {
         try {
@@ -254,15 +252,14 @@ public class ReflectUtils {
     /**
      * 获取指定类中静态变量的值
      *
-     * @param clazz
-     * @param fieldName
-     * @return
+     * @param clazz     类别
+     * @param fieldName 字段名
+     * @return 字段值
      */
     public static Object getStaticFieldValue(Class<?> clazz, String fieldName) {
         try {
             Field field = clazz.getField(fieldName);
-            Object object = field.get(clazz);
-            return object;
+            return field.get(clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -273,14 +270,12 @@ public class ReflectUtils {
      * 根据类别创建实体对象
      *
      * @param clazz 类别
-     * @return
+     * @return 实体对象
      */
     public static Object createInstance(Class<?> clazz) {
         try {
             return clazz.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -290,13 +285,12 @@ public class ReflectUtils {
      * 根据类别名称创建实体对象
      *
      * @param className 类别全路径
-     * @return
+     * @return 实体对象
      */
     public static Object createInstance(String className) {
         try {
-            Class clazz = Class.forName(className);
-            Object obj = clazz.newInstance();
-            return obj;
+            Class<?> clazz = Class.forName(className);
+            return clazz.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -307,12 +301,11 @@ public class ReflectUtils {
      * 根据类别名称创建实体对象
      *
      * @param className 类别全路径
-     * @return
+     * @return 类别
      */
     public static Class<?> getClazz(String className) {
         try {
-            Class clazz = Class.forName(className);
-            return clazz;
+            return Class.forName(className);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -331,9 +324,7 @@ public class ReflectUtils {
         Object pkValue = null;
         try {
             pkValue = column.getEntityField().getValue(entity);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return pkValue;
@@ -366,9 +357,7 @@ public class ReflectUtils {
                 ReflectUtils.setFieldValue(entity, pkName, pkValue);
             }
             return isExistPkValue;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return false;
