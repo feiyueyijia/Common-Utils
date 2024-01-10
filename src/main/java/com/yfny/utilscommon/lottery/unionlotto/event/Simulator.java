@@ -1,6 +1,7 @@
 package com.yfny.utilscommon.lottery.unionlotto.event;
 
 import com.yfny.utilscommon.lottery.award.Award;
+import com.yfny.utilscommon.lottery.award.Counter;
 import com.yfny.utilscommon.lottery.unionlotto.ticket.AwardLottery;
 import com.yfny.utilscommon.lottery.unionlotto.ticket.SaleLottery;
 import com.yfny.utilscommon.util.MathUtils;
@@ -79,22 +80,44 @@ public class Simulator {
         return result;
     }
 
+    public List<Counter> initCounter(int max) {
+        List<Counter> counterList = new ArrayList<>();
+        for (int i = 1; i < max; i++) {
+            Counter counter = new Counter(i, 0);
+            counterList.add(counter);
+        }
+        return counterList;
+    }
+
+    public void addCount(List<Counter> counterList, int[] nums) {
+        for (Counter counter : counterList) {
+            boolean contains = IntStream.of(nums).anyMatch(x -> x == counter.getNum());
+            if (contains) {
+                counter.addCount();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         Simulator simulator = new Simulator();
         String issue = "第 1 期";
-        List<Award> awards = new ArrayList<>();
         AwardLottery awardLottery = new AwardLottery(issue);
+        List<Award> awards = new ArrayList<>();
+        List<Counter> redCounter = simulator.initCounter(34);
+        List<Counter> blueCounter = simulator.initCounter(17);
         int times = 17721088;
         //int times = 10;
         int redSize = 6;
-        int blueSize = 16;
+        int blueSize = 1;
         int duplication = 1;
         int scale = 10;
         int cost = 0;
         int bonus = 0;
         for (int i = 0; i < times; i++) {
             SaleLottery saleLottery = new SaleLottery(issue, redSize, blueSize, duplication);
-            //System.out.println("本期购彩号码为：" + Arrays.toString(saleLottery.getReds()) + " " + Arrays.toString(saleLottery.getBlues()));
+            simulator.addCount(redCounter, saleLottery.getReds());
+            simulator.addCount(blueCounter, saleLottery.getBlues());
+            // System.out.println("本期购彩号码为：" + Arrays.toString(saleLottery.getReds()) + " " + Arrays.toString(saleLottery.getBlues()));
             cost = cost + saleLottery.getPrice();
             Award award = simulator.winAward(saleLottery, awardLottery);
             if (award != null) {
@@ -120,8 +143,22 @@ public class Simulator {
         double award6Count = (int) awards.stream().filter(award -> award.getLevel().equals("六等奖")).count();
         double probability6 = MathUtils.mathAve(award6Count * 100, times, scale);
         double returnRate = MathUtils.mathAve((double) (bonus - cost) * 100, cost, scale);
+        redCounter.sort((c1, c2) -> Integer.compare(c2.getCount(), c1.getCount()));
+        blueCounter.sort((c1, c2) -> Integer.compare(c2.getCount(), c1.getCount()));
+        for (int i = 0; i < redCounter.size(); i++) {
+            double count = redCounter.get(i).getCount();
+            double prob = MathUtils.mathAve(count * 100, times, scale);
+            System.out.println("红区号码排行第" + (i + 1) + "位是" + redCounter.get(i).getNum() + "，选中概率" + prob + "%");
+        }
+        System.out.println();
+        for (int i = 0; i < blueCounter.size(); i++) {
+            double count = blueCounter.get(i).getCount();
+            double prob = MathUtils.mathAve(count * 100, times, scale);
+            System.out.println("蓝区号码排行第" + (i + 1) + "位是" + blueCounter.get(i).getNum() + "，选中概率" + prob + "%");
+        }
+        System.out.println();
         System.out.println("本期中奖号码为：" + Arrays.toString(awardLottery.getReds()) + " " + Arrays.toString(awardLottery.getBlues()));
-        System.out.println("共购买" + times + "注，中奖" + awardCount + "注，中奖概率" + probability + "(" +  6.71 * blueSize + ")%");
+        System.out.println("共购买" + times + "注，中奖" + awardCount + "注，中奖概率" + probability + "(" + 6.71 * blueSize + ")%");
         System.out.println("一等奖" + award1Count + "注，中奖概率" + probability1 + "(" + simulator.showAward().get(0).getProbability() * blueSize * 100 + ")%");
         System.out.println("二等奖" + award2Count + "注，中奖概率" + probability2 + "(" + simulator.showAward().get(1).getProbability() * blueSize * 100 + ")%");
         System.out.println("三等奖" + award3Count + "注，中奖概率" + probability3 + "(" + simulator.showAward().get(2).getProbability() * blueSize * 100 + ")%");
